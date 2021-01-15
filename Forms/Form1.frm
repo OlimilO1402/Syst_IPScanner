@@ -5,6 +5,7 @@ Begin VB.Form FrmIPPingScanner
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   12135
+   Icon            =   "Form1.frx":0000
    LinkTopic       =   "Form1"
    ScaleHeight     =   6135
    ScaleWidth      =   12135
