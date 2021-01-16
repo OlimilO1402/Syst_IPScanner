@@ -22,13 +22,15 @@ Private Type BCur4
     bytes As Currency
 End Type
 Private Type Byte4
-    b1 As Byte
-    b2 As Byte
-    b3 As Byte
-    b4 As Byte
+    b1 As Byte 'kleinster Wert
+    b2 As Byte 'nächsthöherer Wert
+    b3 As Byte 'nächsthöherer Wert
+    b4 As Byte 'höchster Wert
 End Type
 Private m_ip As Byte4
-Private m_Name As String
+Private m_Name   As String
+Private m_Server As String
+Private m_NsluResult As String
 Private m_PingResult As String
 Private m_StatResult As String
 
@@ -52,7 +54,7 @@ Friend Sub New_(StrLngBytesNewAddress, Optional aName As String)
     End Select
     Dim b4 As BArr4, i As Long
     For i = 0 To UBound(va)
-        b4.bytes(i) = CByte(va(i))
+        b4.bytes(3 - i) = CByte(va(i))
         If i > 2 Then Exit For
     Next
     LSet m_ip = b4
@@ -66,7 +68,7 @@ End Function
 
 Friend Function IPToStr() As String
     With m_ip
-        IPToStr = CStr(.b1) & "." & CStr(.b2) & "." & CStr(.b3) & "." & CStr(.b4)
+        IPToStr = CStr(.b4) & "." & CStr(.b3) & "." & CStr(.b2) & "." & CStr(.b1)
     End With
 End Function
 
@@ -76,7 +78,10 @@ End Function
 
 Friend Function ToInfoStr() As String
     ToInfoStr = Me.Name & vbCrLf & String(Len(m_Name), "=") & vbCrLf & _
-                Me.PingResult & vbCrLf & Me.StatResult
+                IIf(Len(m_Server), "Server: " & Me.Server & vbCrLf, "") & _
+                Me.NsluResult & vbCrLf & _
+                Me.PingResult & vbCrLf & _
+                Me.StatResult
 End Function
 Public Property Let LAddress(ByVal Value As Long)
     Dim lb As BLng4: lb.bytes = Value: LSet m_ip = lb
@@ -95,9 +100,13 @@ End Property
 Friend Property Let Name(Value As String)
     m_Name = Value
 End Property
+Public Property Get Server() As String
+    Server = m_Server
+End Property
 
-Public Property Get IsActive() As Boolean
-    IsActive = 0 < InStr(1, m_PingResult, "Antwort")
+Public Property Get IsValid() As Boolean
+    IsValid = 0 < InStr(1, m_PingResult, "Antwort")
+    If Not IsValid Then IsValid = 0 < Len(m_Name)
 End Property
 Public Property Get Compare(other As IPAddressV4) As Integer
     If other.b1 < Me.b1 Then Compare = 1:  Exit Property
@@ -110,13 +119,38 @@ Public Property Get Compare(other As IPAddressV4) As Integer
     If Me.b4 < other.b4 Then Compare = -1: Exit Property
 End Property
 
+Public Sub OneUp()
+    If m_ip.b1 < 255 Then
+        m_ip.b1 = m_ip.b1 + 1
+    ElseIf m_ip.b2 < 255 Then
+        m_ip.b1 = 0
+        m_ip.b2 = m_ip.b2 + 1
+    ElseIf m_ip.b3 < 255 Then
+        m_ip.b1 = 0: m_ip.b2 = 0
+        m_ip.b3 = m_ip.b3 + 1
+    ElseIf m_ip.b4 < 255 Then
+        m_ip.b1 = 0: m_ip.b2 = 0: m_ip.b3 = 0
+        m_ip.b4 = m_ip.b4 + 1
+    Else
+        m_ip.b1 = 0: m_ip.b2 = 0: m_ip.b3 = 0: m_ip.b4 = 0
+    End If
+End Sub
+Public Sub Add(ByVal sum As Currency)
+    Dim cdSrc As BCur4: cdSrc.bytes = sum / 10000
+    Dim curIP As BCur4: LSet curIP = m_ip
+    curIP.bytes = curIP.bytes + cdSrc.bytes
+    LSet m_ip = curIP
+End Sub
+
 Public Property Get PingResult() As String
     PingResult = m_PingResult
 End Property
 Public Property Get StatResult() As String
     StatResult = m_StatResult
 End Property
-
+Public Property Get NsluResult() As String
+    NsluResult = m_NsluResult
+End Property
 Public Property Let b1(ByVal Value As Byte)
     m_ip.b1 = Value
 End Property
@@ -143,8 +177,9 @@ Public Property Get b4() As Byte
 End Property
 
 Public Sub CallPing(Optional WSShell As Object)
-    If WSShell Is Nothing Then Set WSShell = CreateObject("WScript.Shell")
     'Dim WScript As Object: Set WScript = CreateObject("WScript")
+    'Dim WSShell As Object: Set WSShell = CreateObject("WScript.Shell")
+    If WSShell Is Nothing Then Set WSShell = CreateObject("WScript.Shell")
     Dim WSSExec As Object: Set WSSExec = WSShell.Exec("ping -n 1 -w 100 " & Me.IPToStr)
     m_PingResult = WSSExec.StdOut.ReadAll
     If InStr(m_PingResult, "Empfangen = 1") Then
@@ -154,7 +189,6 @@ Public Sub CallPing(Optional WSShell As Object)
         m_Name = ParseNameFromPingResult(m_StatResult)
     End If
 End Sub
-
 Function ParseNameFromPingResult(s As String) As String
     Dim pos1 As Long: pos1 = InStr(1, s, "Ping wird ausgef")
     If pos1 <= 0 Then pos1 = 3
@@ -164,4 +198,37 @@ Function ParseNameFromPingResult(s As String) As String
         ParseNameFromPingResult = Trim(Mid$(s, pos1, pos2 - pos1))
     End If
 End Function
+
+'what about nslookup *IP*
+Public Sub CallNslookup(Optional WSShell As Object)
+Try: On Error GoTo Catch
+    If WSShell Is Nothing Then Set WSShell = CreateObject("WScript.Shell")
+    Dim WSSExec As Object: Set WSSExec = WSShell.Exec("nslookup " & Me.IPToStr)
+    m_NsluResult = WSSExec.StdOut.ReadAll
+    ParseNamesFromNslookupResult m_NsluResult
+    Exit Sub
+Catch:
+    If Err Then
+        MsgBox Err.Number & " " & Err.Description
+    End If
+End Sub
+
+Sub ParseNamesFromNslookupResult(s As String)
+    If Len(s) = 0 Then Exit Sub
+Try: On Error GoTo Catch
+    Dim sLines() As String: sLines = Split(s, vbCrLf)
+    Dim sLine    As String
+    Dim sElems() As String
+    Dim i As Long
+    For i = 0 To UBound(sLines)
+        sLine = Trim$(sLines(i))
+        If Len(sLine) Then
+            sElems = Split(sLine, ":")
+            If sElems(0) = "Name" Then m_Name = Trim$(sElems(1))
+            If sElems(0) = "Server" Then m_Server = Trim$(sElems(1))
+            Debug.Print m_Name & " " & m_Server
+        End If
+    Next
+Catch:
+End Sub
 

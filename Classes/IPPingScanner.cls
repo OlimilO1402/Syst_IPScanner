@@ -13,20 +13,20 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Event FoundIP(aIPV4 As IPAddressV4)
-'Public Event FoundUnnamed(ip As IPAddress)
+Public Event FoundIP(aIPV4 As IPAddressV4, ByRef out_Cancel As Boolean)
 
-Public Sub Scan(IPBase As IPAddressV4, ByVal IPFrom As Integer, ByVal IPTo As Integer)
-    
-    'Dim WScript As Object: Set WScript = CreateObject("WScript")
+Public Sub Scan(IPBase As IPAddressV4, ByVal IPFrom As Long, ByVal IPTo As Long)
     Dim WSShell As Object: Set WSShell = CreateObject("WScript.Shell")
-    Dim newIPV4 As IPAddressV4
-    Dim ib As Integer
-    IPTo = Min(IPTo, 255)
+    Dim newIPV4 As IPAddressV4: Set newIPV4 = IPBase.Clone
+    Dim ib As Long
+    Dim Cancel As Boolean
+    'IPTo = Min(IPTo, 255)
     For ib = IPFrom To IPTo
-        Set newIPV4 = IPBase.Clone: newIPV4.b4 = CByte(ib)
-        newIPV4.CallPing WSShell
-        RaiseEvent FoundIP(newIPV4)
+        Set newIPV4 = newIPV4.Clone
+        newIPV4.CallNslookup WSShell
+        RaiseEvent FoundIP(newIPV4, Cancel)
+        If Cancel Then Exit For
+        newIPV4.OneUp
     Next
 End Sub
 
