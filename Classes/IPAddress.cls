@@ -231,4 +231,12 @@ Try: On Error GoTo Catch
     Next
 Catch:
 End Sub
+Public Function ReadFromStr(s As String) As Boolean
+    
+End Function
+
+Public Function WriteToStr() As String
+    Dim s As String
+    s = Me.IPToStr & vbtab & Me.Name & vbtab & Me.Server & vbtab & Me.NsluResult & vbtab & Me.PingResult & vbtab &
+End Function
 

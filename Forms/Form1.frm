@@ -1,4 +1,5 @@
 VERSION 5.00
+Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form FrmIPPingScanner 
    Caption         =   "IPPingScanner"
    ClientHeight    =   5775
@@ -10,6 +11,37 @@ Begin VB.Form FrmIPPingScanner
    ScaleHeight     =   5775
    ScaleWidth      =   11655
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton BtnClear 
+      Caption         =   "Clear"
+      Height          =   375
+      Left            =   10920
+      TabIndex        =   6
+      Top             =   80
+      Width           =   735
+   End
+   Begin VB.CommandButton BtnSave 
+      Caption         =   "Save"
+      Height          =   375
+      Left            =   10200
+      TabIndex        =   10
+      Top             =   80
+      Width           =   735
+   End
+   Begin VB.CommandButton BtnOpen 
+      Caption         =   "Open"
+      Height          =   375
+      Left            =   9480
+      TabIndex        =   11
+      Top             =   80
+      Width           =   735
+   End
+   Begin MSComDlg.CommonDialog SaveFileDialog 
+      Left            =   9480
+      Top             =   0
+      _ExtentX        =   847
+      _ExtentY        =   847
+      _Version        =   393216
+   End
    Begin VB.TextBox TxtIPInfo 
       BeginProperty Font 
          Name            =   "Consolas"
@@ -60,15 +92,7 @@ Begin VB.Form FrmIPPingScanner
       Top             =   480
       Width           =   2055
    End
-   Begin VB.CommandButton BtnClear 
-      Caption         =   "Clear"
-      Height          =   375
-      Left            =   10800
-      TabIndex        =   6
-      Top             =   80
-      Width           =   855
-   End
-   Begin VB.CommandButton BtnGetNext50IPs 
+   Begin VB.CommandButton BtnScanNext50IPs 
       Caption         =   "Scan next 50 IPs"
       Height          =   375
       Left            =   6840
@@ -141,50 +165,29 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Private m_IPBase As IPAddressV4
-Private m_LastIP As IPAddressV4
-Private m_IPAddresses As IPAddresses
 Private WithEvents IPPingScanner As IPPingScanner
 Attribute IPPingScanner.VB_VarHelpID = -1
-Private StartIPb4  As Long
-Private SearchNIPs As Long
 Private m_CancelFlag As VbMsgBoxResult
 
-Private Sub Command1_Click()
-    Dim IP As IPAddressV4: Set IP = MNew.IPAddressV4("0.0.0.0")
-    'IP.OneUp
-    MsgBox IP.IPToStr
-    
-    IP.Add 512
-    MsgBox IP.IPToStr
-    MsgBox IP.Address
-    MsgBox Hex(IP.LAddress)
-    
-End Sub
-
 Private Sub Form_Load()
-    Set m_IPBase = MNew.IPAddressV4("192.168.178")
-    TxtIPBase.Text = m_IPBase.IPToStr
-    Set m_IPAddresses = New IPAddresses
     Set IPPingScanner = New IPPingScanner
-    SearchNIPs = 50
-    Set m_LastIP = m_IPBase.Clone
+    TxtIPBase.Text = MApp.IPBase.IPToStr
 End Sub
 
-Private Sub BtnGetNext50IPs_Click()
+Private Sub BtnScanNext50IPs_Click()
     LblDTime.Caption = "Scanning..."
     DoEvents
     Dim dt As Single: dt = Timer
-    Dim c As Long: c = SearchNIPs - 1
-    IPPingScanner.Scan m_LastIP, StartIPb4, StartIPb4 + c
-    StartIPb4 = StartIPb4 + c + 1
-    m_LastIP.Add SearchNIPs
+    Dim c As Long: c = MApp.SearchNIPs - 1
+    IPPingScanner.Scan MApp.LastIP, MApp.StartIPb4, MApp.StartIPb4 + c
+    MApp.StartIPb4 = MApp.StartIPb4 + c + 1
+    MApp.LastIP.Add MApp.SearchNIPs
     dt = Timer - dt
     LblDTime.Caption = "Ready! time: " & Format(dt, "#.00") & " sec"
 End Sub
 
 Private Sub BtnClear_Click()
-    m_IPAddresses.Clear
+    MApp.IPAddresses.Clear
     TxtIPInfo.Text = ""
     List1.Clear
     List2.Clear
@@ -209,8 +212,8 @@ Private Sub Form_Resize()
 End Sub
 
 Private Sub IPPingScanner_FoundIP(aIPV4 As IPAddressV4, out_Cancel As Boolean)
-    If Not m_IPAddresses.Contains(aIPV4.IPToStr) Then
-        m_IPAddresses.Add aIPV4
+    If Not IPAddresses.Contains(aIPV4.IPToStr) Then
+        MApp.IPAddresses.Add aIPV4
     Else
         Dim mbr As VbMsgBoxResult
         mbr = MsgBox("Already exists: " & aIPV4.ToStr, vbOKCancel)
@@ -229,8 +232,8 @@ Private Sub List1_Click()
     Dim i As Long: i = List1.ListIndex
     If i < 0 Then Exit Sub
     Dim aIPV4 As IPAddressV4
-    If m_IPAddresses.Contains(List1.List(i)) Then
-        Set aIPV4 = m_IPAddresses.Item(List1.List(i))
+    If MApp.IPAddresses.Contains(List1.List(i)) Then
+        Set aIPV4 = MApp.IPAddresses.Item(List1.List(i))
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If
 End Sub
@@ -242,8 +245,8 @@ Private Sub List2_Click()
     Dim i As Long: i = List2.ListIndex
     If i < 0 Then Exit Sub
     Dim aIPV4 As IPAddressV4
-    If m_IPAddresses.Contains(List2.List(i)) Then
-        Set aIPV4 = m_IPAddresses.Item(List2.List(i))
+    If MApp.IPAddresses.Contains(List2.List(i)) Then
+        Set aIPV4 = MApp.IPAddresses.Item(List2.List(i))
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If
 End Sub
@@ -257,8 +260,8 @@ Private Sub LB_DblClick(aLB As ListBox)
     If i < 0 Then Exit Sub
     Dim s As String: s = aLB.List(i)
     Dim aIPV4 As IPAddressV4
-    If m_IPAddresses.Contains(s) Then
-        Set aIPV4 = m_IPAddresses.Item(s)
+    If MApp.IPAddresses.Contains(s) Then
+        Set aIPV4 = MApp.IPAddresses.Item(s)
         aIPV4.CallPing
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If
@@ -269,14 +272,36 @@ Private Sub mnuOption1_Click()
     s = InputBox("n: ", "How many ips to search each time?", SearchNIPs)
     If s = vbNullString Then Exit Sub
     If Not IsNumeric(s) Then mnuOption1_Click
-    SearchNIPs = CLng(s)
-    BtnGetNext50IPs.Caption = "Scan next " & SearchNIPs & " IPs"
+    MApp.SearchNIPs = CLng(s)
+    BtnScanNext50IPs.Caption = "Scan next " & SearchNIPs & " IPs"
 End Sub
 
 Private Sub TxtIPBase_LostFocus()
     Dim NewBaseIP As IPAddressV4: Set NewBaseIP = MNew.IPAddressV4(TxtIPBase.Text)
     TxtIPBase.Text = NewBaseIP.IPToStr
-    Set m_IPBase = NewBaseIP
-    StartIPb4 = m_IPBase.b1
-    Set m_LastIP = m_IPBase.Clone
+    Set MApp.IPBase = NewBaseIP
+    StartIPb4 = MApp.IPBase.b1
+    Set MApp.LastIP = MApp.IPBase.Clone
 End Sub
+
+'Private Sub Command1_Click()
+'    Dim IP As IPAddressV4: Set IP = MNew.IPAddressV4("0.0.0.0")
+'    'IP.OneUp
+'    MsgBox IP.IPToStr
+'
+'    IP.Add 512
+'    MsgBox IP.IPToStr
+'    MsgBox IP.Address
+'    MsgBox Hex(IP.LAddress)
+'
+'End Sub
+
+
+Private Sub BtnOpen_Click()
+    MApp.OnFileOpen
+End Sub
+
+Private Sub BtnSave_Click()
+    MApp.OnFileSave
+End Sub
+
