@@ -237,6 +237,6 @@ End Function
 
 Public Function WriteToStr() As String
     Dim s As String
-    s = Me.IPToStr & vbtab & Me.Name & vbtab & Me.Server & vbtab & Me.NsluResult & vbtab & Me.PingResult & vbtab &
+    s = Me.IPToStr & vbTab & Me.Name & vbTab & Me.Server & vbTab & Me.NsluResult & vbTab & Me.PingResult & vbTab & Me.StatResult
 End Function
 
