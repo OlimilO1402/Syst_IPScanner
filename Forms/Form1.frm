@@ -4,39 +4,15 @@ Begin VB.Form FrmIPPingScanner
    Caption         =   "IPPingScanner"
    ClientHeight    =   5775
    ClientLeft      =   225
-   ClientTop       =   570
+   ClientTop       =   870
    ClientWidth     =   11655
    Icon            =   "Form1.frx":0000
    LinkTopic       =   "Form1"
    ScaleHeight     =   5775
    ScaleWidth      =   11655
    StartUpPosition =   3  'Windows-Standard
-   Begin VB.CommandButton BtnClear 
-      Caption         =   "Clear"
-      Height          =   375
-      Left            =   10920
-      TabIndex        =   6
-      Top             =   80
-      Width           =   735
-   End
-   Begin VB.CommandButton BtnSave 
-      Caption         =   "Save"
-      Height          =   375
-      Left            =   10200
-      TabIndex        =   10
-      Top             =   80
-      Width           =   735
-   End
-   Begin VB.CommandButton BtnOpen 
-      Caption         =   "Open"
-      Height          =   375
-      Left            =   9480
-      TabIndex        =   11
-      Top             =   80
-      Width           =   735
-   End
-   Begin MSComDlg.CommonDialog SaveFileDialog 
-      Left            =   9480
+   Begin MSComDlg.CommonDialog FileDialog 
+      Left            =   1680
       Top             =   0
       _ExtentX        =   847
       _ExtentY        =   847
@@ -97,7 +73,7 @@ Begin VB.Form FrmIPPingScanner
       Height          =   375
       Left            =   6840
       TabIndex        =   4
-      Top             =   80
+      Top             =   45
       Width           =   1935
    End
    Begin VB.TextBox TxtIPBase 
@@ -121,7 +97,7 @@ Begin VB.Form FrmIPPingScanner
       Caption         =   "            "
       Height          =   195
       Left            =   8880
-      TabIndex        =   9
+      TabIndex        =   8
       Top             =   120
       Width           =   540
    End
@@ -130,7 +106,7 @@ Begin VB.Form FrmIPPingScanner
       Caption         =   "Valid IP-addresses:"
       Height          =   195
       Left            =   2160
-      TabIndex        =   8
+      TabIndex        =   7
       Top             =   120
       Width           =   1350
    End
@@ -139,7 +115,7 @@ Begin VB.Form FrmIPPingScanner
       Caption         =   "Invalid IP-addresses:"
       Height          =   195
       Left            =   120
-      TabIndex        =   7
+      TabIndex        =   6
       Top             =   120
       Width           =   1470
    End
@@ -151,11 +127,37 @@ Begin VB.Form FrmIPPingScanner
       Top             =   120
       Width           =   615
    End
-   Begin VB.Menu mnuOption 
-      Caption         =   "Option"
-      Visible         =   0   'False
-      Begin VB.Menu mnuOption1 
+   Begin VB.Menu mnuFile 
+      Caption         =   "&File"
+      Begin VB.Menu mnuFileNew 
+         Caption         =   "&New"
+      End
+      Begin VB.Menu mnuFileOpen 
+         Caption         =   "&Open..."
+      End
+      Begin VB.Menu mnuFileSave 
+         Caption         =   "&Save"
+      End
+      Begin VB.Menu mnuFileSaveAs 
+         Caption         =   "Save &As..."
+      End
+      Begin VB.Menu mnuFileSep1 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuFileExit 
+         Caption         =   "E&xit"
+      End
+   End
+   Begin VB.Menu mnuOpt 
+      Caption         =   "&Option"
+      Begin VB.Menu mnuOptOption 
          Caption         =   "Option"
+      End
+   End
+   Begin VB.Menu mnuHelp 
+      Caption         =   " &? "
+      Begin VB.Menu mnuHelpInfo 
+         Caption         =   "Info"
       End
    End
 End
@@ -165,16 +167,104 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Private WithEvents IPPingScanner As IPPingScanner
+Public WithEvents IPPingScanner As IPPingScanner
 Attribute IPPingScanner.VB_VarHelpID = -1
 Private m_CancelFlag As VbMsgBoxResult
 
 Private Sub Form_Load()
     Set IPPingScanner = New IPPingScanner
-    TxtIPBase.Text = MApp.IPBase.IPToStr
+    'TxtIPBase.Text = MApp.IPBase.IPToStr
+End Sub
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    If Button = MouseButtonConstants.vbRightButton Then
+        PopupMenu mnuOpt
+    End If
+End Sub
+Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
+    If MApp.DataChanged Then
+        Dim mbr As VbMsgBoxResult: mbr = MsgBox("Data changed, save it?", vbYesNoCancel)
+        Select Case mbr
+        Case vbYes:  mnuFileSave_Click
+                     'Cancel = True
+        Case vbNo:   'just quit
+        Case Cancel: Cancel = True
+        End Select
+    End If
+End Sub
+Private Sub Form_Resize()
+    Dim l As Single, t As Single, W As Single, H As Single
+    l = List1.Left: t = List1.Top: W = List1.Width: H = Me.ScaleHeight - t
+    If W > 0 And H > 0 Then List1.Move l, t, W, H
+    l = List2.Left: t = List2.Top: W = List2.Width ': H = Me.ScaleHeight - T
+    If W > 0 And H > 0 Then List2.Move l, t, W, H
+    l = TxtIPInfo.Left: t = TxtIPInfo.Top: W = Me.ScaleWidth - l
+    If W > 0 And H > 0 Then TxtIPInfo.Move l, t, W, H
+End Sub
+
+Public Sub UpdateView()
+    Dim doc As Document: Set doc = MApp.Document
+End Sub
+' v ############################## v '  Menu mnuFile  ' v ############################## v '
+Private Sub mnuFileNew_Click()
+    MApp.IPAddresses.Clear
+    
+    TxtIPInfo.Text = ""
+    List1.Clear
+    List2.Clear
+    StartIPb4 = 0
+    'SearchNIPs = 50
+End Sub
+Private Sub mnuFileOpen_Click()
+    'Me.FileDialog.FileName = "IPScan" & Now
+    If MApp.DlgFileOpen_Show(Me.FileDialog) = vbCancel Then Exit Sub
+    MApp.FileOpen Me.FileDialog.FileName
+
+End Sub
+Private Sub mnuFileSave_Click()
+    MApp.FileSave
+End Sub
+Private Sub mnuFileSaveAs_Click()
+'https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/cc144156(v=vs.85)
+    If MApp.DlgFileSave_Show(Me.FileDialog) = vbCancel Then Exit Sub
+    
+    MApp.FileSave Me.FileDialog.FileName
+End Sub
+
+Private Sub mnuFileExit_Click()
+    Unload Me
+End Sub
+' ^ ############################## ^ '  Menu mnuFile  ' ^ ############################## ^ '
+
+' v ############################## v '  Menu mnuOpt   ' v ############################## v '
+Private Sub mnuOptOption_Click()
+    Dim s As String
+    s = InputBox("n: ", "How many ips to search each time?", SearchNIPs)
+    If s = vbNullString Then Exit Sub
+    If Not IsNumeric(s) Then
+        mnuOptOption_Click
+        Exit Sub
+    End If
+    MApp.SearchNIPs = CLng(s)
+    BtnScanNext50IPs.Caption = "Scan next " & SearchNIPs & " IPs"
+End Sub
+' ^ ############################## ^ '  Menu mnuOpt   ' ^ ############################## ^ '
+
+' v ############################## v '  Menu mnuInfo  ' v ############################## v '
+Private Sub mnuHelpInfo_Click()
+    MsgBox "MBO-Ing.com IPPingScanner 1.0"
+End Sub
+' ^ ############################## ^ '  Menu mnuInfo  ' ^ ############################## ^ '
+
+Private Sub TxtIPBase_LostFocus()
+    Dim NewBaseIP As IPAddressV4: Set NewBaseIP = MNew.IPAddressV4(TxtIPBase.Text)
+    TxtIPBase.Text = NewBaseIP.IPToStr
+    Set MApp.IPBase = NewBaseIP
+    StartIPb4 = MApp.IPBase.b1
+    Set MApp.LastIP = MApp.IPBase.Clone
 End Sub
 
 Private Sub BtnScanNext50IPs_Click()
+    'MApp.DataChanged = True
     LblDTime.Caption = "Scanning..."
     DoEvents
     Dim dt As Single: dt = Timer
@@ -184,31 +274,6 @@ Private Sub BtnScanNext50IPs_Click()
     MApp.LastIP.Add MApp.SearchNIPs
     dt = Timer - dt
     LblDTime.Caption = "Ready! time: " & Format(dt, "#.00") & " sec"
-End Sub
-
-Private Sub BtnClear_Click()
-    MApp.IPAddresses.Clear
-    TxtIPInfo.Text = ""
-    List1.Clear
-    List2.Clear
-    StartIPb4 = 0
-    'SearchNIPs = 50
-End Sub
-
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Button = MouseButtonConstants.vbRightButton Then
-        PopupMenu mnuOption
-    End If
-End Sub
-
-Private Sub Form_Resize()
-    Dim L As Single, t As Single, W As Single, H As Single
-    L = List1.Left: t = List1.Top: W = List1.Width: H = Me.ScaleHeight - t
-    If W > 0 And H > 0 Then List1.Move L, t, W, H
-    L = List2.Left: t = List2.Top: W = List2.Width ': H = Me.ScaleHeight - T
-    If W > 0 And H > 0 Then List2.Move L, t, W, H
-    L = TxtIPInfo.Left: t = TxtIPInfo.Top: W = Me.ScaleWidth - L
-    If W > 0 And H > 0 Then TxtIPInfo.Move L, t, W, H
 End Sub
 
 Private Sub IPPingScanner_FoundIP(aIPV4 As IPAddressV4, out_Cancel As Boolean)
@@ -265,43 +330,5 @@ Private Sub LB_DblClick(aLB As ListBox)
         aIPV4.CallPing
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If
-End Sub
-
-Private Sub mnuOption1_Click()
-    Dim s As String
-    s = InputBox("n: ", "How many ips to search each time?", SearchNIPs)
-    If s = vbNullString Then Exit Sub
-    If Not IsNumeric(s) Then mnuOption1_Click
-    MApp.SearchNIPs = CLng(s)
-    BtnScanNext50IPs.Caption = "Scan next " & SearchNIPs & " IPs"
-End Sub
-
-Private Sub TxtIPBase_LostFocus()
-    Dim NewBaseIP As IPAddressV4: Set NewBaseIP = MNew.IPAddressV4(TxtIPBase.Text)
-    TxtIPBase.Text = NewBaseIP.IPToStr
-    Set MApp.IPBase = NewBaseIP
-    StartIPb4 = MApp.IPBase.b1
-    Set MApp.LastIP = MApp.IPBase.Clone
-End Sub
-
-'Private Sub Command1_Click()
-'    Dim IP As IPAddressV4: Set IP = MNew.IPAddressV4("0.0.0.0")
-'    'IP.OneUp
-'    MsgBox IP.IPToStr
-'
-'    IP.Add 512
-'    MsgBox IP.IPToStr
-'    MsgBox IP.Address
-'    MsgBox Hex(IP.LAddress)
-'
-'End Sub
-
-
-Private Sub BtnOpen_Click()
-    MApp.OnFileOpen
-End Sub
-
-Private Sub BtnSave_Click()
-    MApp.OnFileSave
 End Sub
 

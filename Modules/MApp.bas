@@ -1,32 +1,80 @@
 Attribute VB_Name = "MApp"
 Option Explicit
-Public IPBase      As IPAddressV4
-Public LastIP      As IPAddressV4
-Public SearchNIPs  As Long
-Public StartIPb4   As Long
-Public IPAddresses As IPAddresses
+Private m_Doc As Document
+Private Const mExt As String = "ipscan"
 
 Sub Main()
-    Set IPBase = MNew.IPAddressV4("192.168.178")
-    Set LastIP = IPBase.Clone
-    Set IPAddresses = New IPAddresses
-    SearchNIPs = 50
     FrmIPPingScanner.Show
+    NewDoc
+End Sub
+Public Sub NewDoc()
+    Set m_Doc = CreateNewDoc
+    Set m_Doc.IPPingScanner = FrmIPPingScanner.IPPingScanner
 End Sub
 
-Public Sub OnFileOpen()
-    Dim FNm As String:  FNm = MNew.GetOpenFileName
-    Dim FNr As Integer: FNr = FreeFile
+Private Function CreateNewDoc() As Document
+    Dim ib As IPAddressV4: Set ib = MNew.IPAddressV4("192.168.178")
+    Set CreateNewDoc = MNew.Document(ib, ib.Clone, 50)
+End Function
+Public Property Get FileName() As String
+    FileName = m_FileName
+End Property
+Public Property Let FileName(ByVal Value As String)
+    m_FileName = Value
+End Property
+Public Property Get DefaultFileName() As String
+    DefaultFileName = "IPScan" & Now & "."
+End Property
+
+Function DlgFileOpen_Show(aDlg As CommonDialog) As VbMsgBoxResult
+Try: On Error GoTo Catch
+    With aDlg
+        .Filter = "ipscan-files [*." & mExt & "]|*." & mExt
+        .FilterIndex = 0
+        .DefaultExt = "*.ipscan"
+        .FileName = MApp.FileName
+        .InitDir = App.Path
+        .ShowOpen
+    End With
+Catch:
+    DlgFileOpen_Show = IIf(Err.Number = MSComDlg.ErrorConstants.cdlCancel, VbMsgBoxResult.vbCancel, VbMsgBoxResult.vbOK)
+End Function
+
+Function DlgFileSave_Show(aDlg As CommonDialog) As VbMsgBoxResult
+Try: On Error GoTo Catch
+    With aDlg
+        .Filter = "ipscan-files [*.ipscan]|*.ipscan"
+        .FilterIndex = 0
+        .DefaultExt = "*.ipscan"
+        .FileName = MApp.FileName
+        '.InitDir = App.Path
+        .ShowSave
+    End With
+Catch:
+    DlgFileSave_Show = IIf(Err.Number = MSComDlg.ErrorConstants.cdlCancel, VbMsgBoxResult.vbCancel, VbMsgBoxResult.vbOK)
+End Function
+
+
+Public Sub FileOpen(Optional ByVal aFNm As String = "")
 Try: On Error GoTo Finally
-    Open FNm For Binary Access Write As FNr
+    Dim FNm As String:  FNm = IIf(Len(aFNm), MApp.FileName, aFNm)
+    Dim FNr As Integer: FNr = FreeFile
+    Open FNm For Binary Access Read As FNr
     Dim s As String: s = Space(LOF(FNr))
     Get FNr, , s
     Dim sLines() As String: sLines = Split(s, vbCrLf)
-    Dim l As Long, i As Long, u As Long: ul = UBound(sLines)
+    Dim l As Long, i As Long, ul As Long: ul = UBound(sLines)
     
+    
+    'read the Base IP
                If l <= ul Then Set IPBase = MNew.IPAddressV4(sLines(l))
+    
+    'read the last IP
     l = l + 1: If l <= ul Then Set LastIP = MNew.IPAddressV4(sLines(l))
+    
+    'read how much IPs to search in one step
     l = l + 1: If l <= ul Then SearchNIPs = CLng(sLines(l))
+    
     l = l + 1: If l <= ul Then StartIPb4 = CLng(sLines(l))
     Dim c As Long
     l = l + 1: If l <= ul Then c = CLng(sLines(l))
@@ -34,21 +82,20 @@ Try: On Error GoTo Finally
     For i = 0 To c - 1
         IPAddresses.Add MNew.IPAddressV4(sLines(l))
     Next
-    i = i + 1: If i <= u Then Set LastIP = MNew.IPAddressV4(sLines(i))
-    i = i + 1: If i <= u Then Set LastIP = MNew.IPAddressV4(sLines(i))
-    i = i + 1: If i <= u Then Set LastIP = MNew.IPAddressV4(sLines(i))
-    i = i + 1: If i <= u Then Set LastIP = MNew.IPAddressV4(sLines(i))
-    i = i + 1: If i <= u Then Set LastIP = MNew.IPAddressV4(sLines(i))
-    i = i + 1: If i <= u Then Set LastIP = MNew.IPAddressV4(sLines(i))
-    i = i + 1: If i <= u Then Set LastIP = MNew.IPAddressV4(sLines(i))
+    i = i + 1: If i <= ul Then Set LastIP = MNew.IPAddressV4(sLines(i))
+    i = i + 1: If i <= ul Then Set LastIP = MNew.IPAddressV4(sLines(i))
+    i = i + 1: If i <= ul Then Set LastIP = MNew.IPAddressV4(sLines(i))
+    i = i + 1: If i <= ul Then Set LastIP = MNew.IPAddressV4(sLines(i))
+    i = i + 1: If i <= ul Then Set LastIP = MNew.IPAddressV4(sLines(i))
+    i = i + 1: If i <= ul Then Set LastIP = MNew.IPAddressV4(sLines(i))
+    i = i + 1: If i <= ul Then Set LastIP = MNew.IPAddressV4(sLines(i))
     
 Finally:
     Close FNr
     
 End Sub
 
-Public Sub OnFileSave()
-    Dim FNm As String:  FNm = MNew.GetSaveFileName
+Public Sub FileSave(FNm As String)
     Dim FNr As Integer: FNr = FreeFile
 Try: On Error GoTo Finally
     DelFile FNm

@@ -5,56 +5,60 @@ Public Function IPAddressV4(StrLngBytesNewAddress, Optional aName As String) As 
     Set IPAddressV4 = New IPAddressV4: IPAddressV4.New_ StrLngBytesNewAddress, aName
 End Function
 
+Public Function Document(aIPBase As IPAddressV4, aLastIP As IPAddressV4, nSearchIPs As Long, aScanner As IPPingScanner) As Document
+    Set Document = New Document: Document.New_ aIPBase, aLastIP, nSearchIPs, aScanner
+End Function
+    
 Public Function Min(V1, V2)
     If V1 < V2 Then Min = V1 Else Min = V2
 End Function
     
-Public Function GetOpenFileName() As String
-Try: On Error GoTo Catch
-    With FrmIPPingScanner.SaveFileDialog
-        .CancelError = True
-        .Filter = "ipscan-files [*.ipscan]|*.ipscan"
-        .FilterIndex = 0
-        .DefaultExt = "*.ipscan"
-        .FontName = "IPScan-" & Now
-        .InitDir = App.Path
-    'FrmIPPingScanner.SaveFileDialog.ShowColor
-    'FrmIPPingScanner.SaveFileDialog.ShowFont
-    'FrmIPPingScanner.SaveFileDialog.ShowHelp
-    'FrmIPPingScanner.SaveFileDialog.ShowOpen
-    'FrmIPPingScanner.SaveFileDialog.ShowPrinter
-        .ShowOpen
-    End With
-    Exit Function
-Catch:
-    If Err.Number <> MSComDlg.ErrorConstants.cdlCancel Then
-        MsgBox MessCommonDlgError(Err.Number)
-    End If
-End Function
-    
-Public Function GetSaveFileName() As String
-Try: On Error GoTo Catch
-    With FrmIPPingScanner.SaveFileDialog
-        .CancelError = True
-        .Filter = "ipscan-files [*.ipscan]|*.ipscan"
-        .FilterIndex = 0
-        .DefaultExt = "*.ipscan"
-        .FontName = "IPScan-" & Now
-        .InitDir = App.Path
-    'FrmIPPingScanner.SaveFileDialog.ShowColor
-    'FrmIPPingScanner.SaveFileDialog.ShowFont
-    'FrmIPPingScanner.SaveFileDialog.ShowHelp
-    'FrmIPPingScanner.SaveFileDialog.ShowOpen
-    'FrmIPPingScanner.SaveFileDialog.ShowPrinter
-        .ShowSave
-    End With
-    Exit Function
-Catch:
-    If Err.Number <> MSComDlg.ErrorConstants.cdlCancel Then
-        MsgBox MessCommonDlgError(Err.Number)
-    End If
-End Function
-
+'Public Function GetOpenFileName() As String
+'Try: On Error GoTo Catch
+'    With FrmIPPingScanner.SaveFileDialog
+'        .CancelError = True
+'        .Filter = "ipscan-files [*.ipscan]|*.ipscan"
+'        .FilterIndex = 0
+'        .DefaultExt = "*.ipscan"
+'        .FileName = "IPScan-" & Now
+'        .InitDir = App.Path
+'    'FrmIPPingScanner.SaveFileDialog.ShowColor
+'    'FrmIPPingScanner.SaveFileDialog.ShowFont
+'    'FrmIPPingScanner.SaveFileDialog.ShowHelp
+'    'FrmIPPingScanner.SaveFileDialog.ShowOpen
+'    'FrmIPPingScanner.SaveFileDialog.ShowPrinter
+'        .ShowOpen
+'    End With
+'    Exit Function
+'Catch:
+'    If Err.Number <> MSComDlg.ErrorConstants.cdlCancel Then
+'        MsgBox MessCommonDlgError(Err.Number)
+'    End If
+'End Function
+'
+'Public Function GetSaveFileName() As String
+'Try: On Error GoTo Catch
+'    With FrmIPPingScanner.SaveFileDialog
+'        .CancelError = True
+'        .Filter = "ipscan-files [*.ipscan]|*.ipscan"
+'        .FilterIndex = 0
+'        .DefaultExt = "*.ipscan"
+'        .FontName = "IPScan-" & Now
+'        .InitDir = App.Path
+'    'FrmIPPingScanner.SaveFileDialog.ShowColor
+'    'FrmIPPingScanner.SaveFileDialog.ShowFont
+'    'FrmIPPingScanner.SaveFileDialog.ShowHelp
+'    'FrmIPPingScanner.SaveFileDialog.ShowOpen
+'    'FrmIPPingScanner.SaveFileDialog.ShowPrinter
+'        .ShowSave
+'    End With
+'    Exit Function
+'Catch:
+'    If Err.Number <> MSComDlg.ErrorConstants.cdlCancel Then
+'        MsgBox MessCommonDlgError(Err.Number)
+'    End If
+'End Function
+'
 Public Function MessCommonDlgError(e As MSComDlg.ErrorConstants) As String
     Dim s As String
     Select Case e
