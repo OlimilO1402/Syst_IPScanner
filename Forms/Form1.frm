@@ -181,7 +181,7 @@ Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As 
     End If
 End Sub
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
-    If MApp.DataChanged Then
+    If MApp.Doc.IsDataChanged Then
         Dim mbr As VbMsgBoxResult: mbr = MsgBox("Data changed, save it?", vbYesNoCancel)
         Select Case mbr
         Case vbYes:  mnuFileSave_Click
@@ -202,16 +202,21 @@ Private Sub Form_Resize()
 End Sub
 
 Public Sub UpdateView()
-    Dim doc As Document: Set doc = MApp.Document
+    Dim Doc As Document: Set Doc = MApp.Doc
 End Sub
+
 ' v ############################## v '  Menu mnuFile  ' v ############################## v '
 Private Sub mnuFileNew_Click()
-    MApp.IPAddresses.Clear
+    'MApp.Doc.IPAddresses.Clear
+    
+    MApp.NewDoc
     
     TxtIPInfo.Text = ""
     List1.Clear
     List2.Clear
-    StartIPb4 = 0
+    
+    'MApp.Doc.StartIPb4 = 0
+    'StartIPb4 = 0
     'SearchNIPs = 50
 End Sub
 Private Sub mnuFileOpen_Click()
@@ -238,14 +243,14 @@ End Sub
 ' v ############################## v '  Menu mnuOpt   ' v ############################## v '
 Private Sub mnuOptOption_Click()
     Dim s As String
-    s = InputBox("n: ", "How many ips to search each time?", SearchNIPs)
+    s = InputBox("n: ", "How many ips to search each time?", MApp.Doc.SearchNIPs)
     If s = vbNullString Then Exit Sub
     If Not IsNumeric(s) Then
         mnuOptOption_Click
         Exit Sub
     End If
-    MApp.SearchNIPs = CLng(s)
-    BtnScanNext50IPs.Caption = "Scan next " & SearchNIPs & " IPs"
+    MApp.Doc.SearchNIPs = CLng(s)
+    BtnScanNext50IPs.Caption = "Scan next " & MApp.Doc.SearchNIPs & " IPs"
 End Sub
 ' ^ ############################## ^ '  Menu mnuOpt   ' ^ ############################## ^ '
 
@@ -258,9 +263,9 @@ End Sub
 Private Sub TxtIPBase_LostFocus()
     Dim NewBaseIP As IPAddressV4: Set NewBaseIP = MNew.IPAddressV4(TxtIPBase.Text)
     TxtIPBase.Text = NewBaseIP.IPToStr
-    Set MApp.IPBase = NewBaseIP
-    StartIPb4 = MApp.IPBase.b1
-    Set MApp.LastIP = MApp.IPBase.Clone
+    Set MApp.Doc.IPBase = NewBaseIP
+    MApp.Doc.StartIPb4 = MApp.Doc.IPBase.b1
+    Set MApp.Doc.LastIP = MApp.Doc.IPBase.Clone
 End Sub
 
 Private Sub BtnScanNext50IPs_Click()
@@ -268,17 +273,17 @@ Private Sub BtnScanNext50IPs_Click()
     LblDTime.Caption = "Scanning..."
     DoEvents
     Dim dt As Single: dt = Timer
-    Dim c As Long: c = MApp.SearchNIPs - 1
-    IPPingScanner.Scan MApp.LastIP, MApp.StartIPb4, MApp.StartIPb4 + c
-    MApp.StartIPb4 = MApp.StartIPb4 + c + 1
-    MApp.LastIP.Add MApp.SearchNIPs
+    Dim c As Long: c = MApp.Doc.SearchNIPs - 1
+    IPPingScanner.Scan MApp.Doc.LastIP, MApp.Doc.StartIPb4, MApp.Doc.StartIPb4 + c
+    MApp.Doc.StartIPb4 = MApp.Doc.StartIPb4 + c + 1
+    MApp.Doc.LastIP.Add MApp.Doc.SearchNIPs
     dt = Timer - dt
     LblDTime.Caption = "Ready! time: " & Format(dt, "#.00") & " sec"
 End Sub
 
 Private Sub IPPingScanner_FoundIP(aIPV4 As IPAddressV4, out_Cancel As Boolean)
-    If Not IPAddresses.Contains(aIPV4.IPToStr) Then
-        MApp.IPAddresses.Add aIPV4
+    If Not MApp.Doc.IPAddresses.Contains(aIPV4.IPToStr) Then
+        MApp.Doc.IPAddresses.Add aIPV4
     Else
         Dim mbr As VbMsgBoxResult
         mbr = MsgBox("Already exists: " & aIPV4.ToStr, vbOKCancel)
@@ -297,8 +302,8 @@ Private Sub List1_Click()
     Dim i As Long: i = List1.ListIndex
     If i < 0 Then Exit Sub
     Dim aIPV4 As IPAddressV4
-    If MApp.IPAddresses.Contains(List1.List(i)) Then
-        Set aIPV4 = MApp.IPAddresses.Item(List1.List(i))
+    If MApp.Doc.IPAddresses.Contains(List1.List(i)) Then
+        Set aIPV4 = MApp.Doc.IPAddresses.Item(List1.List(i))
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If
 End Sub
@@ -310,8 +315,8 @@ Private Sub List2_Click()
     Dim i As Long: i = List2.ListIndex
     If i < 0 Then Exit Sub
     Dim aIPV4 As IPAddressV4
-    If MApp.IPAddresses.Contains(List2.List(i)) Then
-        Set aIPV4 = MApp.IPAddresses.Item(List2.List(i))
+    If MApp.Doc.IPAddresses.Contains(List2.List(i)) Then
+        Set aIPV4 = MApp.Doc.IPAddresses.Item(List2.List(i))
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If
 End Sub
@@ -325,8 +330,8 @@ Private Sub LB_DblClick(aLB As ListBox)
     If i < 0 Then Exit Sub
     Dim s As String: s = aLB.List(i)
     Dim aIPV4 As IPAddressV4
-    If MApp.IPAddresses.Contains(s) Then
-        Set aIPV4 = MApp.IPAddresses.Item(s)
+    If MApp.Doc.IPAddresses.Contains(s) Then
+        Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         aIPV4.CallPing
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If

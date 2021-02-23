@@ -34,6 +34,17 @@ Public Sub Scan()
     IPPingScanner.Scan m_IPBase, m_StartIPb4, m_StartIPb4 + m_SearchNIPs - 1
 End Sub
 
+Public Property Let FileName(ByVal Value As String)
+    m_FileName = Value
+End Property
+Public Property Get FileName() As String
+    FileName = m_FileName
+End Property
+
+Public Property Get IPAddresses() As IPAddresses
+    Set IPAddresses = m_IPAddresses
+End Property
+
 Public Property Get IPBase() As IPAddressV4
     Set IPBase = m_IPBase
 End Property
@@ -51,17 +62,17 @@ Public Property Set LastIP(Value As IPAddressV4)
 End Property
 
 Public Property Get SearchNIPs() As Long
-    Set LastIP = m_SearchNIPs
+    SearchNIPs = m_SearchNIPs
 End Property
-Public Property Set SearchNIPs(ByVal Value As Long)
+Public Property Let SearchNIPs(ByVal Value As Long)
     m_SearchNIPs = Value
     m_Changed = True
 End Property
-m_StartIPb4
+
 Public Property Get StartIPb4() As Long
-    Set LastIP = m_StartIPb4
+    StartIPb4 = m_StartIPb4
 End Property
-Public Property Set StartIPb4(ByVal Value As Long)
+Public Property Let StartIPb4(ByVal Value As Long)
     m_StartIPb4 = Value
     m_Changed = True
 End Property
@@ -76,7 +87,7 @@ Public Property Get IsDataChanged() As Boolean
 End Property
 
 Private Sub IPPingScanner_FoundIP(aIPV4 As IPAddressV4, out_Cancel As Boolean)
-    If Not m_IPAddresses.Contains(aIPV4) Then
-        
+    If Not m_IPAddresses.Contains(aIPV4.IPToStr) Then
+        '
     End If
 End Sub
