@@ -232,11 +232,29 @@ Try: On Error GoTo Catch
 Catch:
 End Sub
 Public Function ReadFromStr(s As String) As Boolean
+    'm_ip As Byte4
+    'm_Name   As String
+    'm_Server As String
+    'm_NsluResult As String
+    'm_PingResult As String
+    'm_StatResult As String
+Try: On Error GoTo Catch
+    Dim sl() As String: sl = Split(s, vbTab)
+    Dim ub As Long: ub = UBound(sl)
+    Dim i As Long
+    If ub > 0 Then New_ sl(i)
+    i = i + 1: If ub >= i Then m_Name = sl(i)
+    i = i + 1: If ub >= i Then m_Server = sl(i)
+    i = i + 1: If ub >= i Then m_NsluResult = sl(i)
+    i = i + 1: If ub >= i Then m_PingResult = sl(i)
+    i = i + 1: If ub >= i Then m_StatResult = sl(i)
+        
+    Exit Function
+Catch:
     
 End Function
 
 Public Function WriteToStr() As String
-    Dim s As String
-    s = Me.IPToStr & vbTab & Me.Name & vbTab & Me.Server & vbTab & Me.NsluResult & vbTab & Me.PingResult & vbTab & Me.StatResult
+    WriteToStr = Me.IPToStr & vbTab & Me.Name & vbTab & Me.Server & vbTab & Me.NsluResult & vbTab & Me.PingResult & vbTab & Me.StatResult
 End Function
 

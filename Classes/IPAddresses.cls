@@ -34,11 +34,16 @@ Try: On Error GoTo Catch
     Exit Function
 Catch:
 End Function
+
 Public Property Get Count() As Long
     Count = m_List.Count
 End Property
 
 Public Property Get Item(aIPV4 As String) As IPAddressV4
     Set Item = m_List.Item(aIPV4)
+End Property
+
+Public Property Get ItemI(Index As Long) As IPAddressV4
+    Set ItemI = m_List.Item(Index)
 End Property
 

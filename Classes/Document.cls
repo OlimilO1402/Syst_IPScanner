@@ -82,6 +82,9 @@ Public Sub IPAddresses_Add(aIP As IPAddressV4) 'As IPAddressV4
     m_Changed = True
 End Sub
 
+Public Property Let IsDataChanged(ByVal Value As Boolean)
+    m_Changed = Value
+End Property
 Public Property Get IsDataChanged() As Boolean
     IsDataChanged = m_Changed
 End Property

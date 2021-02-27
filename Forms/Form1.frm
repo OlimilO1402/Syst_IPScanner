@@ -89,6 +89,7 @@ Begin VB.Form FrmIPPingScanner
       Height          =   330
       Left            =   4800
       TabIndex        =   0
+      Text            =   "192.168.178"
       Top             =   80
       Width           =   1935
    End
@@ -203,6 +204,17 @@ End Sub
 
 Public Sub UpdateView()
     Dim Doc As Document: Set Doc = MApp.Doc
+    Me.TxtIPBase.Text = Doc.IPBase.ToStr
+    Dim ip As IPAddressV4
+    Dim i As Long
+    For i = 1 To Doc.IPAddresses.Count
+        Set ip = Doc.IPAddresses.ItemI(i)
+        If ip.IsValid Then
+            List2.AddItem ip.IPToStr
+        Else
+            List1.AddItem ip.IPToStr
+        End If
+    Next
 End Sub
 
 ' v ############################## v '  Menu mnuFile  ' v ############################## v '
@@ -223,16 +235,21 @@ Private Sub mnuFileOpen_Click()
     'Me.FileDialog.FileName = "IPScan" & Now
     If MApp.DlgFileOpen_Show(Me.FileDialog) = vbCancel Then Exit Sub
     MApp.FileOpen Me.FileDialog.FileName
-
+    MApp.Doc.IsDataChanged = False
+    UpdateView 'MApp.Doc
 End Sub
 Private Sub mnuFileSave_Click()
     MApp.FileSave
+    'TODO: we should first ask if filesave was True
+    MApp.Doc.IsDataChanged = False
 End Sub
 Private Sub mnuFileSaveAs_Click()
 'https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/cc144156(v=vs.85)
     If MApp.DlgFileSave_Show(Me.FileDialog) = vbCancel Then Exit Sub
-    
     MApp.FileSave Me.FileDialog.FileName
+    'TODO: we should first ask if filesave was True
+    MApp.Doc.IsDataChanged = False
+
 End Sub
 
 Private Sub mnuFileExit_Click()
@@ -337,3 +354,8 @@ Private Sub LB_DblClick(aLB As ListBox)
     End If
 End Sub
 
+'Private Sub UpdateView(aDoc As Document)
+
+    'TxtIPBase.Text = aDoc.
+
+'End Sub
