@@ -273,7 +273,8 @@ End Sub
 
 ' v ############################## v '  Menu mnuInfo  ' v ############################## v '
 Private Sub mnuHelpInfo_Click()
-    MsgBox "MBO-Ing.com IPPingScanner 1.0"
+    'MsgBox "MBO-Ing.com IPPingScanner " vbcrlf & App.CompanyName & " " & App.EXEName & " " & App.Major & "." & App.Minor & "." & App.Revision
+    MsgBox App.CompanyName & " " & App.EXEName & " " & App.Major & "." & App.Minor & "." & App.Revision
 End Sub
 ' ^ ############################## ^ '  Menu mnuInfo  ' ^ ############################## ^ '
 
