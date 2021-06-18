@@ -60,6 +60,7 @@ Friend Sub New_(StrLngBytesNewAddress, Optional aName As String)
     LSet m_ip = b4
 End Sub
 Friend Sub NewC(other As IPAddressV4)
+    Debug.Print other.IPToStr
     Me.LAddress = other.LAddress
 End Sub
 Friend Function Clone() As IPAddressV4

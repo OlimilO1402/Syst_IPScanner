@@ -331,10 +331,12 @@ End Sub
 
 Private Sub List2_Click()
     Dim i As Long: i = List2.ListIndex
+    Dim s As String: s = List2.List(i)
     If i < 0 Then Exit Sub
     Dim aIPV4 As IPAddressV4
-    If MApp.Doc.IPAddresses.Contains(List2.List(i)) Then
-        Set aIPV4 = MApp.Doc.IPAddresses.Item(List2.List(i))
+    If MApp.Doc.IPAddresses.Contains(s) Then
+        Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
+        Debug.Print aIPV4.IPToStr
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If
 End Sub
