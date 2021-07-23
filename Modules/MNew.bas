@@ -9,6 +9,14 @@ Public Function Document(aIPBase As IPAddressV4, aLastIP As IPAddressV4, nSearch
     Set Document = New Document: Document.New_ aIPBase, aLastIP, nSearchIPs, aScanner
 End Function
     
+Public Function Splitter(bMDI As Boolean, MyOwner As Object, MyContainer As Object, Name As String, LeftTop As Control, RghtBot As Control) As Splitter
+    Set Splitter = New Splitter: Splitter.New_ bMDI, MyOwner, MyContainer, Name, LeftTop, RghtBot
+End Function
+
+Public Function InternetURL(sURL As String) As InternetURL
+    Set InternetURL = New InternetURL: InternetURL.New_ sURL
+End Function
+
 Public Function Min(V1, V2)
     If V1 < V2 Then Min = V1 Else Min = V2
 End Function

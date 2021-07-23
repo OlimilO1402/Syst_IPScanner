@@ -7,6 +7,15 @@ Sub Main()
     FrmIPPingScanner.Show
     NewDoc
 End Sub
+
+Public Function GetMyIP() As String
+    Dim s As String: s = MNew.InternetURL("http://checkip.dyndns.org").Read
+    Dim i As Long:   i = InStr(1, s, "IP Address: "): If i = 0 Then Exit Function
+    Dim L As Long:   L = InStr(1, s, "</body>"):      If L = 0 Then Exit Function
+    i = i + 12:    L = L - i
+    GetMyIP = Mid(s, i, L)
+End Function
+
 Public Sub NewDoc()
     Set m_Doc = CreateNewDoc
     'Set m_Doc.IPPingScanner = FrmIPPingScanner.IPPingScanner
@@ -131,14 +140,14 @@ Finally:
     End If
 End Sub
 Private Sub BinaryWriteString(aFNr As Integer, s As String)
-    Dim l As Long: l = Len(s)
-    Put aFNr, , l
+    Dim L As Long: L = Len(s)
+    Put aFNr, , L
     Put aFNr, , s
 End Sub
 Private Function BinaryReadString(aFNr As Integer) As String
-    Dim l As Long, s As String
-    Get aFNr, , l
-    s = Space(l)
+    Dim L As Long, s As String
+    Get aFNr, , L
+    s = Space(L)
     Get aFNr, , s
     BinaryReadString = s
 End Function

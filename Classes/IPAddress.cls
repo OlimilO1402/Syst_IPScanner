@@ -33,6 +33,7 @@ Private m_Server As String
 Private m_NsluResult As String
 Private m_PingResult As String
 Private m_StatResult As String
+Private m_Port       'As Long 'by default it's missing
 
 Friend Sub New_(StrLngBytesNewAddress, Optional aName As String)
     'StrLngBytesNewAddress: you can either give a string, or a bytearray or a long, or a currency
@@ -70,6 +71,7 @@ End Function
 Friend Function IPToStr() As String
     With m_ip
         IPToStr = CStr(.b4) & "." & CStr(.b3) & "." & CStr(.b2) & "." & CStr(.b1)
+        If Not IsEmpty(m_Port) Then IPToStr = IPToStr & ":" & CStr(CLng(m_Port))
     End With
 End Function
 
@@ -100,6 +102,12 @@ Public Property Get Name() As String
 End Property
 Friend Property Let Name(Value As String)
     m_Name = Value
+End Property
+Public Property Get Port()
+    Port = m_Port
+End Property
+Public Property Let Port(Value)
+    m_Port = Value
 End Property
 Public Property Get Server() As String
     Server = m_Server
