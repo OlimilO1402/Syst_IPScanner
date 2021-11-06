@@ -67,7 +67,8 @@ End Function
 '    End If
 'End Function
 '
-Public Function MessCommonDlgError(e As MSComDlg.ErrorConstants) As String
+'Public Function MessCommonDlgError(e As MSComDlg.ErrorConstants) As String
+Public Function MessCommonDlgError(e As Long) As String
     Dim s As String
     Select Case e
     Case cdlDialogFailure:        s = "Dialog Failure"         '= -32768 (&HFFFF8000)

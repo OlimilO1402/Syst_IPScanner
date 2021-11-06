@@ -30,6 +30,20 @@ Public Sub Scan(IPBase As IPAddressV4, ByVal IPFrom As Long, ByVal IPTo As Long)
     Next
 End Sub
 
+Public Sub Scan2(IPBase As IPAddressV4, ByVal IPFrom As Long, ByVal IPTo As Long)
+    Dim newIPV4 As IPAddressV4: Set newIPV4 = IPBase.Clone
+    Dim ib As Long
+    Dim Cancel As Boolean
+    'IPTo = Min(IPTo, 255)
+    For ib = IPFrom To IPTo
+        'newIPV4.CallNslookup WSShell
+        newIPV4.CallDNS
+        RaiseEvent FoundIP(newIPV4, Cancel)
+        If Cancel Then Exit For
+        Set newIPV4 = newIPV4.Clone
+        newIPV4.OneUp
+    Next
+End Sub
 
 
 '    On Error Resume Next

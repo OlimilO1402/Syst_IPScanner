@@ -222,6 +222,16 @@ Catch:
     End If
 End Sub
 
+Public Sub CallDNS()
+Try: On Error GoTo Catch
+    Dim sName As String
+    Dim rv As Long
+    rv = MDns.IP2HostName(Me.IPToStr, sName)
+    m_Name = sName
+Catch:
+    
+End Sub
+
 Sub ParseNamesFromNslookupResult(s As String)
     If Len(s) = 0 Then Exit Sub
 Try: On Error GoTo Catch

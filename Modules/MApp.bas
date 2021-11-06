@@ -2,6 +2,11 @@ Attribute VB_Name = "MApp"
 Option Explicit
 Private m_Doc As Document
 Private Const mExt As String = "ipscan"
+#If VBA7 = 0 Then
+    Public Enum LongPtr
+        [_]
+    End Enum
+#End If
 
 Sub Main()
     FrmIPPingScanner.Show
@@ -47,32 +52,37 @@ End Property
 '    DefaultFileName = "IPScan" & Now & "."
 'End Property
 
-Function DlgFileOpen_Show(aDlg As CommonDialog) As VbMsgBoxResult
+'Function DlgFileOpen_Show(aDlg As CommonDialog) As VbMsgBoxResult
+Function DlgFileOpen_Show(aDlg As OpenFileDialog) As VbMsgBoxResult
 Try: On Error GoTo Catch
     With aDlg
+        
         .Filter = "ipscan-files [*." & mExt & "]|*." & mExt
         .FilterIndex = 0
         .DefaultExt = "*.ipscan"
         .FileName = MApp.FileName
-        .InitDir = App.Path
-        .ShowOpen
+        .InitialDirectory = App.Path
+        DlgFileOpen_Show = .ShowDialog
     End With
 Catch:
-    DlgFileOpen_Show = IIf(Err.Number = MSComDlg.ErrorConstants.cdlCancel, VbMsgBoxResult.vbCancel, VbMsgBoxResult.vbOK)
+    'DlgFileOpen_Show = IIf(Err.Number = MSComDlg.ErrorConstants.cdlCancel, VbMsgBoxResult.vbCancel, VbMsgBoxResult.vbOK)
+    'DlgFileOpen_Show = IIf(Err.Number = MSComDlg.ErrorConstants.cdlCancel, VbMsgBoxResult.vbCancel, VbMsgBoxResult.vbOK)
 End Function
 
-Function DlgFileSave_Show(aDlg As CommonDialog) As VbMsgBoxResult
+'Function DlgFileSave_Show(aDlg As CommonDialog) As VbMsgBoxResult
+Function DlgFileSave_Show(aDlg As SaveFileDialog) As VbMsgBoxResult
 Try: On Error GoTo Catch
     With aDlg
         .Filter = "ipscan-files [*.ipscan]|*.ipscan"
         .FilterIndex = 0
         .DefaultExt = "*.ipscan"
         .FileName = MApp.FileName
+        '.InitialDirectory = App.Path
         '.InitDir = App.Path
-        .ShowSave
+        DlgFileSave_Show = .ShowDialog
     End With
 Catch:
-    DlgFileSave_Show = IIf(Err.Number = MSComDlg.ErrorConstants.cdlCancel, VbMsgBoxResult.vbCancel, VbMsgBoxResult.vbOK)
+    'DlgFileSave_Show = IIf(Err.Number = MSComDlg.ErrorConstants.cdlCancel, VbMsgBoxResult.vbCancel, VbMsgBoxResult.vbOK)
 End Function
 
 
@@ -98,13 +108,13 @@ Try: On Error GoTo Finally
     Dim c As Long
     s = BinaryReadString(FNr): c = CLng(s)
     Dim i As Long
-    Dim ip As IPAddressV4
+    Dim IP As IPAddressV4
     'If c > 0 Then Set IPAddresses = New IPAddresses
     For i = 0 To c - 1
         s = BinaryReadString(FNr)
-        Set ip = New IPAddressV4
-        ip.ReadFromStr s
-        m_Doc.IPAddresses_Add ip
+        Set IP = New IPAddressV4
+        IP.ReadFromStr s
+        m_Doc.IPAddresses_Add IP
     Next
     
 Finally:
@@ -126,11 +136,11 @@ Try: On Error GoTo Finally
     BinaryWriteString FNr, CStr(m_Doc.StartIPb4)
     BinaryWriteString FNr, CStr(m_Doc.IPAddresses.Count)
     Dim i As Long
-    Dim ip As IPAddressV4
+    Dim IP As IPAddressV4
     Dim s As String
     For i = 1 To m_Doc.IPAddresses.Count '- 1
-        Set ip = m_Doc.IPAddresses.ItemI(i)
-        s = ip.WriteToStr
+        Set IP = m_Doc.IPAddresses.ItemI(i)
+        s = IP.WriteToStr
         BinaryWriteString FNr, s
     Next
 Finally:

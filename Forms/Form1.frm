@@ -1,5 +1,4 @@
 VERSION 5.00
-Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form FrmIPPingScanner 
    Caption         =   "IPScanner"
    ClientHeight    =   6375
@@ -11,6 +10,14 @@ Begin VB.Form FrmIPPingScanner
    ScaleHeight     =   6375
    ScaleWidth      =   12495
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton Command1 
+      Caption         =   "Command1"
+      Height          =   375
+      Left            =   10800
+      TabIndex        =   11
+      Top             =   0
+      Width           =   1335
+   End
    Begin VB.PictureBox Panel1 
       Appearance      =   0  '2D
       BackColor       =   &H80000005&
@@ -84,13 +91,6 @@ Begin VB.Form FrmIPPingScanner
             Width           =   2295
          End
       End
-   End
-   Begin MSComDlg.CommonDialog FileDialog 
-      Left            =   1680
-      Top             =   0
-      _ExtentX        =   847
-      _ExtentY        =   847
-      _Version        =   393216
    End
    Begin VB.CommandButton BtnScanNextXXIPs 
       Caption         =   "Scan next 50 IPs"
@@ -224,6 +224,14 @@ Attribute Splitter1.VB_VarHelpID = -1
 Private Splitter2 As Splitter
 Private mnuPopListBox As ListBox
 
+Private Sub Command1_Click()
+    Dim sIP As String: sIP = "192.168.178.20"
+    Dim sName As String
+    Dim rv As Long
+    rv = MDns.IP2HostName(sIP, sName)
+    MsgBox sName
+End Sub
+
 Private Sub Form_Load()
     Set IPPingScanner = New IPPingScanner
     'TxtIPBase.Text = MApp.IPBase.IPToStr
@@ -275,14 +283,14 @@ End Sub
 Public Sub UpdateView()
     Dim Doc As Document: Set Doc = MApp.Doc
     Me.TxtIPBase.Text = Doc.IPBase.ToStr
-    Dim ip As IPAddressV4
+    Dim IP As IPAddressV4
     Dim i As Long
     For i = 1 To Doc.IPAddresses.Count
-        Set ip = Doc.IPAddresses.ItemI(i)
-        If ip.IsValid Then
-            List2.AddItem ip.IPToStr
+        Set IP = Doc.IPAddresses.ItemI(i)
+        If IP.IsValid Then
+            List2.AddItem IP.IPToStr
         Else
-            List1.AddItem ip.IPToStr
+            List1.AddItem IP.IPToStr
         End If
     Next
     BtnScanNextXXIPs.Caption = "Scan next " & MApp.Doc.SearchNIPs & " IPs"
@@ -304,8 +312,9 @@ Private Sub mnuFileNew_Click()
 End Sub
 Private Sub mnuFileOpen_Click()
     'Me.FileDialog.FileName = "IPScan" & Now
-    If MApp.DlgFileOpen_Show(Me.FileDialog) = vbCancel Then Exit Sub
-    MApp.FileOpen Me.FileDialog.FileName
+    Dim OFD As OpenFileDialog: Set OFD = New OpenFileDialog
+    If MApp.DlgFileOpen_Show(OFD) = vbCancel Then Exit Sub
+    MApp.FileOpen OFD.FileName
     MApp.Doc.IsDataChanged = False
     UpdateView 'MApp.Doc
 End Sub
@@ -316,8 +325,9 @@ Private Sub mnuFileSave_Click()
 End Sub
 Private Sub mnuFileSaveAs_Click()
 'https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/cc144156(v=vs.85)
-    If MApp.DlgFileSave_Show(Me.FileDialog) = vbCancel Then Exit Sub
-    MApp.FileSave Me.FileDialog.FileName
+    Dim SFD As SaveFileDialog: Set SFD = New SaveFileDialog
+    If MApp.DlgFileSave_Show(SFD) = vbCancel Then Exit Sub
+    MApp.FileSave SFD.FileName
     'TODO: we should first ask if filesave was True
     MApp.Doc.IsDataChanged = False
 
@@ -417,7 +427,11 @@ Private Sub BtnScanNextXXIPs_Click()
     DoEvents
     Dim dt As Single: dt = Timer
     Dim c As Long: c = MApp.Doc.SearchNIPs - 1
+    
     IPPingScanner.Scan MApp.Doc.LastIP, MApp.Doc.StartIPb4, MApp.Doc.StartIPb4 + c
+    
+    'IPPingScanner.Scan2 MApp.Doc.LastIP, MApp.Doc.StartIPb4, MApp.Doc.StartIPb4 + c
+    
     MApp.Doc.StartIPb4 = MApp.Doc.StartIPb4 + c + 1
     MApp.Doc.LastIP.Add MApp.Doc.SearchNIPs
     dt = Timer - dt
