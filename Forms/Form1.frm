@@ -175,8 +175,18 @@ Begin VB.Form FrmIPPingScanner
    End
    Begin VB.Menu mnuOpt 
       Caption         =   "&Option"
-      Begin VB.Menu mnuOptOption 
-         Caption         =   "Option"
+      Begin VB.Menu mnuOptOptionN 
+         Caption         =   "Option N"
+      End
+      Begin VB.Menu mnuOptDllOrNslookup 
+         Caption         =   "Dll or Nslookup"
+         Begin VB.Menu mnuOptDllOrNslookupExe 
+            Caption         =   "Nslookup.exe"
+            Checked         =   -1  'True
+         End
+         Begin VB.Menu mnuOptDllOrNslookupDll 
+            Caption         =   "Dns.dll"
+         End
       End
    End
    Begin VB.Menu mnuHelp 
@@ -339,16 +349,25 @@ End Sub
 ' ^ ############################## ^ '  Menu mnuFile  ' ^ ############################## ^ '
 
 ' v ############################## v '  Menu mnuOpt   ' v ############################## v '
-Private Sub mnuOptOption_Click()
+Private Sub mnuOptOptionN_Click()
     Dim s As String
     s = InputBox("n: ", "How many ips to search each time?", MApp.Doc.SearchNIPs)
     If s = vbNullString Then Exit Sub
     If Not IsNumeric(s) Then
-        mnuOptOption_Click
+        mnuOptOptionN_Click
         Exit Sub
     End If
     MApp.Doc.SearchNIPs = CLng(s)
     BtnScanNextXXIPs.Caption = "Scan next " & MApp.Doc.SearchNIPs & " IPs"
+End Sub
+
+Private Sub mnuOptDllOrNslookupDll_Click()
+    mnuOptDllOrNslookupExe.Checked = False
+    mnuOptDllOrNslookupDll.Checked = True
+End Sub
+Private Sub mnuOptDllOrNslookupExe_Click()
+    mnuOptDllOrNslookupExe.Checked = True
+    mnuOptDllOrNslookupDll.Checked = False
 End Sub
 
 Private Sub mnuPopAddPort_Click()
@@ -428,9 +447,11 @@ Private Sub BtnScanNextXXIPs_Click()
     Dim dt As Single: dt = Timer
     Dim c As Long: c = MApp.Doc.SearchNIPs - 1
     
-    IPPingScanner.Scan MApp.Doc.LastIP, MApp.Doc.StartIPb4, MApp.Doc.StartIPb4 + c
-    
-    'IPPingScanner.Scan2 MApp.Doc.LastIP, MApp.Doc.StartIPb4, MApp.Doc.StartIPb4 + c
+    If mnuOptDllOrNslookupExe.Checked Then
+        IPPingScanner.Scan MApp.Doc.LastIP, MApp.Doc.StartIPb4, MApp.Doc.StartIPb4 + c
+    Else
+        IPPingScanner.Scan2 MApp.Doc.LastIP, MApp.Doc.StartIPb4, MApp.Doc.StartIPb4 + c
+    End If
     
     MApp.Doc.StartIPb4 = MApp.Doc.StartIPb4 + c + 1
     MApp.Doc.LastIP.Add MApp.Doc.SearchNIPs
@@ -506,6 +527,9 @@ Private Sub LB_DblClick(aLB As ListBox)
     Dim aIPV4 As IPAddressV4
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
+        If mnuOptDllOrNslookupDll.Checked Then
+            aIPV4.CallNslookup
+        End If
         aIPV4.CallPing
         TxtIPInfo.Text = aIPV4.ToInfoStr
     End If

@@ -229,7 +229,9 @@ Try: On Error GoTo Catch
     rv = MDns.IP2HostName(Me.IPToStr, sName)
     m_Name = sName
 Catch:
-    
+    If Err Then
+        MsgBox Err.Number & " " & Err.Description
+    End If
 End Sub
 
 Sub ParseNamesFromNslookupResult(s As String)
