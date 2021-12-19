@@ -10,14 +10,6 @@ Begin VB.Form FrmIPPingScanner
    ScaleHeight     =   6375
    ScaleWidth      =   12495
    StartUpPosition =   3  'Windows-Standard
-   Begin VB.CommandButton Command1 
-      Caption         =   "Command1"
-      Height          =   375
-      Left            =   10800
-      TabIndex        =   11
-      Top             =   0
-      Width           =   1335
-   End
    Begin VB.PictureBox Panel1 
       Appearance      =   0  '2D
       BackColor       =   &H80000005&
@@ -200,6 +192,7 @@ Begin VB.Form FrmIPPingScanner
    End
    Begin VB.Menu mnuPopup 
       Caption         =   "mnuPopup"
+      Visible         =   0   'False
       Begin VB.Menu mnuPopAddPort 
          Caption         =   "Add port"
       End
@@ -234,13 +227,13 @@ Attribute Splitter1.VB_VarHelpID = -1
 Private Splitter2 As Splitter
 Private mnuPopListBox As ListBox
 
-Private Sub Command1_Click()
-    Dim sIP As String: sIP = "192.168.178.20"
-    Dim sName As String
-    Dim rv As Long
-    rv = MDns.IP2HostName(sIP, sName)
-    MsgBox sName
-End Sub
+'Private Sub Command1_Click()
+'    Dim sIP As String: sIP = "192.168.178.20"
+'    Dim sName As String
+'    Dim rv As Long
+'    rv = MDns.IP2HostName(sIP, sName)
+'    MsgBox sName
+'End Sub
 
 Private Sub Form_Load()
     Set IPPingScanner = New IPPingScanner
