@@ -136,29 +136,14 @@ End Type
 '    'others(9)   As Long
 'End Type
 
-Private Declare Function DnsQuery Lib "dnsapi" Alias "DnsQuery_A" ( _
-    ByVal Name As String, _
-    ByVal wType As Integer, _
-    ByVal Options As Long, _
-    ByRef aipServers As Any, _
-    ByRef ppQueryResultsSet As Long, _
-    ByVal pReserved As Long) As Long
 
-Private Declare Function DnsRecordListFree Lib "dnsapi" ( _
-    ByVal pDnsRecord As LongPtr, _
-    ByVal DnsFreeRecordListDeep As Long) As Long
+Private Declare Function DnsRecordListFree Lib "dnsapi" (ByVal pDnsRecord As LongPtr, ByVal DnsFreeRecordListDeep As Long) As Long
 
-Private Declare Sub RtlMoveMemory Lib "kernel32" ( _
-    ByRef pDst As Any, _
-    ByRef pSrc As Any, _
-    ByVal BytLen As Long)
+Private Declare Sub RtlMoveMemory Lib "kernel32" (ByRef pDst As Any, ByRef pSrc As Any, ByVal BytLen As Long)
 
-Private Declare Function StrCopyA Lib "kernel32" Alias "lstrcpyA" ( _
-    ByVal retval As String, _
-    ByVal PTR As Long) As Long
+Private Declare Function StrCopyA Lib "kernel32" Alias "lstrcpyA" (ByVal retval As String, ByVal PTR As Long) As Long
 
-Private Declare Function StrLenA Lib "kernel32" Alias "lstrlenA" ( _
-    ByVal PTR As LongPtr) As Long
+Private Declare Function StrLenA Lib "kernel32" Alias "lstrlenA" (ByVal PTR As LongPtr) As Long
     
 ''https://docs.microsoft.com/en-us/windows/win32/api/windns/nf-windns-dnsquery_w
 ''DNS_STATUS DnsQuery_W(
@@ -169,6 +154,7 @@ Private Declare Function StrLenA Lib "kernel32" Alias "lstrlenA" ( _
 ''  [out, optional]     PDNS_RECORD *ppQueryResults,
 ''  [out, optional]     PVOID * pReserved
 '');
+Private Declare Function DnsQuery_A Lib "dnsapi" (ByVal pName As String, ByVal wType As Integer, ByVal Options As Long, ByRef aipServers As Any, ByRef ppQueryResultsSet As Long, ByVal pReserved As Long) As Long
 Private Declare Function DnsQuery_W Lib "dnsapi" (ByVal pName As LongPtr, ByVal wType As Integer, ByVal Options As Long, ByRef aipServers As Any, ByRef ppQueryResultsSet As Any, ByVal pReserved As Long) As DNS_STATUS
 '
 'Private Declare Function DnsRecordListFree Lib "dnsapi" (ByVal pDnsRecord As LongPtr, ByVal DnsFreeRecordListDeep As Long) As Long
