@@ -165,7 +165,7 @@ Begin VB.Form FrmIPPingScanner
          Caption         =   "E&xit"
       End
    End
-   Begin VB.Menu mnuOpt 
+   Begin VB.Menu mnuopt 
       Caption         =   "&Option"
       Begin VB.Menu mnuOptOptionN 
          Caption         =   "Option N"
@@ -179,6 +179,12 @@ Begin VB.Form FrmIPPingScanner
          Begin VB.Menu mnuOptDllOrNslookupDll 
             Caption         =   "Dns.dll"
          End
+      End
+      Begin VB.Menu mnuOptionsUserPCName 
+         Caption         =   "Get User+Computername"
+      End
+      Begin VB.Menu mnuOptionNetViewDomain 
+         Caption         =   "net view /domain:"
       End
    End
    Begin VB.Menu mnuHelp 
@@ -250,9 +256,9 @@ Private Sub Form_Load()
     Splitter2.LeftTopPos = List2.Width
     mnuPopup.Visible = False
 End Sub
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = MouseButtonConstants.vbRightButton Then
-        PopupMenu mnuOpt
+        PopupMenu mnuopt
     End If
 End Sub
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
@@ -267,7 +273,7 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
     End If
 End Sub
 Private Sub Form_Resize()
-    Dim L As Single, T As Single, W As Single, H As Single
+    Dim l As Single, T As Single, W As Single, H As Single
 
 '    L = List1.Left: T = List1.Top: W = List1.Width: H = Me.ScaleHeight - T
 '    If W > 0 And H > 0 Then List1.Move L, T, W, H
@@ -276,24 +282,24 @@ Private Sub Form_Resize()
 '    L = TxtIPInfo.Left: T = TxtIPInfo.Top: W = Me.ScaleWidth - L
 '    If W > 0 And H > 0 Then TxtIPInfo.Move L, T, W, H
     Dim brdr As Single: 'brdr = 8 * Screen.TwipsPerPixelX
-    L = 0: T = Panel1.Top
-    W = Me.ScaleWidth - L
+    l = 0: T = Panel1.Top
+    W = Me.ScaleWidth - l
     H = Me.ScaleHeight - T
-    If W > 0 And H > 0 Then Panel1.Move L, T, W, H
+    If W > 0 And H > 0 Then Panel1.Move l, T, W, H
     
 End Sub
 
 Public Sub UpdateView()
     Dim Doc As Document: Set Doc = MApp.Doc
     Me.TxtIPBase.Text = Doc.IPBase.ToStr
-    Dim IP As IPAddressV4
+    Dim ip As IPAddressV4
     Dim i As Long
     For i = 1 To Doc.IPAddresses.Count
-        Set IP = Doc.IPAddresses.ItemI(i)
-        If IP.IsValid Then
-            List2.AddItem IP.IPToStr
+        Set ip = Doc.IPAddresses.ItemI(i)
+        If ip.IsValid Then
+            List2.AddItem ip.IPToStr
         Else
-            List1.AddItem IP.IPToStr
+            List1.AddItem ip.IPToStr
         End If
     Next
     BtnScanNextXXIPs.Caption = "Scan next " & MApp.Doc.SearchNIPs & " IPs"
@@ -410,6 +416,58 @@ Private Sub mnuOptNslookupIPport_Click()
     MsgBox "n.y.i. todo: mnuOptNslookupIPport_Click"
 End Sub
 
+Private Sub mnuOptionsUserPCName_Click()
+Try: On Error GoTo Catch
+    'den Usernamen und den PC-Namen herausfinden und ins Netzwerk in eine Datei schreiben bzw anhängen
+    Dim ip As IPAddressV4: Set ip = MSocket.GetMyIP
+    Dim un As String:          un = MApp.UserName
+    Dim cn As String:          cn = MApp.ComputerName
+    Dim hn As String:          hn = MSocket.MyHostName
+    'MsgBox "IP-Adress:    " & ip.ToStr & vbCrLf & _
+    '       "Userrname:    " & un & vbCrLf & _
+    '       "Computername: " & cn & vbCrLf & _
+    '       "Hostname:     " & hn
+    Dim pfn As PathFileName: Set pfn = MNew.PathFileName("C:\Install\IPScanner\IPScanner.bin")
+    If Not pfn.PathExists Then
+        If MsgBox("Path does not exist, Create Path?" & vbCrLf & pfn.Path, vbOKCancel) = vbCancel Then Exit Sub
+        If Not pfn.PathCreate Then
+            MsgBox "Could not create path: " & vbCrLf & pfn.Path
+            Exit Sub
+        End If
+    End If
+    Dim fc As String
+    fc = "IP-Address: " & ip.ToStr & "; Username: " & un & "; Computername: " & cn & vbCrLf & _
+         "Also write to file?"
+    If MsgBox(fc, vbOKCancel) = vbCancel Then Exit Sub
+    
+    fc = "IP-Address: " & vbTab & ip.ToStr & vbTab & "; Username: " & vbTab & un & vbTab & "; Computername: " & vbTab & cn
+    
+    pfn.OpenFile FileMode_Append, FileAccess_Write
+    pfn.WriteStr fc
+    
+'z.B. so:
+'* open Command prompt
+'* get the machine name with: nbtstat --a 192.168.2.77
+'* get the user    name with: net view /domain:puhla.de > c:\ip\ip.txt
+    
+    GoTo Finally
+Catch:
+    ErrHandler "mnuOptionsUserPCName"
+Finally:
+    If Not pfn Is Nothing Then pfn.CloseFile
+End Sub
+
+Private Sub mnuOptionNetViewDomain_Click()
+    'https://itstillworks.com/user-name-ip-address-6909133.html
+    'nbtstat --a ip
+    'net view /domain:ad > c:\ip\ip.txt
+    
+    'oder Tipp von hsachse:
+    'wmic /node:10.0.0.112 computersystem get username /value
+    'oder Tipp0479
+    'http://www.activevb.de/tipps/vb6tipps/tipp0479.html
+End Sub
+
 ' ^ ############################## ^ '  Menu mnuOpt   ' ^ ############################## ^ '
 
 ' v ############################## v '  Menu mnuInfo  ' v ############################## v '
@@ -481,7 +539,7 @@ End Sub
 Private Sub List1_DblClick()
     LB_DblClick List1
 End Sub
-Private Sub List1_MouseDown(Button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub List1_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     Dim btn As MouseButtonConstants: btn = Button
     If btn = vbRightButton Then
         Set mnuPopListBox = List1
@@ -504,14 +562,13 @@ End Sub
 Private Sub List2_DblClick()
     LB_DblClick List2
 End Sub
-Private Sub List2_MouseDown(Button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub List2_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     Dim btn As MouseButtonConstants: btn = Button
     If btn = vbRightButton Then
         Set mnuPopListBox = List2
         PopupMenu mnuPopup
     End If
 End Sub
-
 
 Private Sub LB_DblClick(aLB As ListBox)
     Dim i As Long: i = aLB.ListIndex
@@ -533,3 +590,30 @@ End Sub
     'TxtIPBase.Text = aDoc.
 
 'End Sub
+
+
+''copy this same function to every class, form or module
+''the name of the class or form will be added automatically
+''in standard-modules the function "TypeName(Me)" will not work, so simply replace it with the name of the Module
+'' v ############################## v '   Local ErrHandler   ' v ############################## v '
+Private Function ErrHandler(ByVal FuncName As String, _
+                            Optional ByVal AddInfo As String, _
+                            Optional WinApiError, _
+                            Optional bLoud As Boolean = True, _
+                            Optional bErrLog As Boolean = True, _
+                            Optional vbDecor As VbMsgBoxStyle = vbOKCancel, _
+                            Optional bRetry As Boolean) As VbMsgBoxResult
+
+    If bRetry Then
+
+        ErrHandler = MessErrorRetry(TypeName(Me), FuncName, AddInfo, WinApiError, bErrLog)
+
+    Else
+
+        ErrHandler = MessError(TypeName(Me), FuncName, AddInfo, WinApiError, bLoud, bErrLog, vbDecor)
+
+    End If
+
+End Function
+
+

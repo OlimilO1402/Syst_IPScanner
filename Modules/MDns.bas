@@ -1,10 +1,10 @@
 Attribute VB_Name = "MDns"
 Option Explicit
-#If VBA7 = 0 Then
-    Private Enum LongPtr
-        [_]
-    End Enum
-#End If
+'#If VBA7 = 0 Then
+'    Private Enum LongPtr
+'        [_]
+'    End Enum
+'#End If
 
 Private Const DNS_TYPE_PTR          As Long = &HC
 Private Const DNS_QUERY_STANDARD    As Long = &H0
@@ -119,7 +119,7 @@ Private Type VBDnsRecord
     pName       As LongPtr
     wType       As Integer
     wDataLength As Integer
-    flags       As Long
+    Flags       As Long
     dwTTL       As Long
     dwReserved  As Long
     DataPtr     As LongPtr
@@ -232,7 +232,7 @@ Public Function IP2HostName(ByVal IP As String, ByRef HostName As String) As Lon
     Dim Record As VBDnsRecord
     Dim Length As Long
     'Returns DNS_STATUS Enum values, otherwise a DNS system error code.
-
+    
     IP = Trim$(IP)
     If Len(IP) = 0 Then IP2HostName = ERROR_BAD_IP_FORMAT: Exit Function
     Octets = Split(IP, ".")
@@ -255,8 +255,8 @@ Public Function IP2HostName(ByVal IP As String, ByRef HostName As String) As Lon
     
     'what the heck is IN-ADDR.ARPA
     IP = Octets(3) & "." & Octets(2) & "." & Octets(1) & "." & Octets(0) & ".IN-ADDR.ARPA"
-
-    IP2HostName = DnsQuery(IP, DNS_TYPE_PTR, DNS_QUERY_STANDARD, ByVal 0, lngDNSRec, 0)
+    
+    IP2HostName = DnsQuery_W(StrPtr(IP), DNS_TYPE_PTR, DNS_QUERY_STANDARD, ByVal 0, lngDNSRec, 0)
     If IP2HostName = DNS_STATUS_SUCCESS Then
         If lngDNSRec <> 0 Then
             RtlMoveMemory Record, ByVal lngDNSRec, LenB(Record)

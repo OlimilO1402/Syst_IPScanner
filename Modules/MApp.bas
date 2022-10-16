@@ -2,23 +2,41 @@ Attribute VB_Name = "MApp"
 Option Explicit
 Private m_Doc As Document
 Private Const mExt As String = "ipscan"
-#If VBA7 = 0 Then
-    Public Enum LongPtr
-        [_]
-    End Enum
-#End If
+'#If VBA7 = 0 Then
+'    Public Enum LongPtr
+'        [_]
+'    End Enum
+'#End If
+Private Declare Function GetUserNameW Lib "advapi32" (ByVal lpBuffer As LongPtr, nSize_inout As Long) As Long
+Private Declare Function GetComputerNameW Lib "kernel32" (ByVal lpBuffer As LongPtr, nSize_inout As Long) As Boolean
 
 Sub Main()
     FrmIPPingScanner.Show
     NewDoc
 End Sub
 
+Public Property Get UserName() As String
+    Dim nl As Long:   nl = 256
+    Dim nm As String: nm = String$(nl, vbNullChar)
+    Dim rv As Long:   rv = GetUserNameW(StrPtr(nm), nl)
+    nm = Left$(nm, nl)
+    UserName = MString.Trim0(nm)
+End Property
+
+Public Property Get ComputerName() As String
+    Dim nl As Long:   nl = 256
+    Dim nm As String: nm = String$(nl, vbNullChar)
+    Dim rv As Long:   rv = GetComputerNameW(StrPtr(nm), nl)
+    nm = Left$(nm, nl)
+    ComputerName = MString.Trim0(nm)
+End Property
+
 Public Function GetMyIP() As String
     Dim s As String: s = MNew.InternetURL("http://checkip.dyndns.org").Read
     Dim i As Long:   i = InStr(1, s, "IP Address: "): If i = 0 Then Exit Function
-    Dim L As Long:   L = InStr(1, s, "</body>"):      If L = 0 Then Exit Function
-    i = i + 12:    L = L - i
-    GetMyIP = Mid(s, i, L)
+    Dim l As Long:   l = InStr(1, s, "</body>"):      If l = 0 Then Exit Function
+    i = i + 12:    l = l - i
+    GetMyIP = Mid(s, i, l)
 End Function
 
 Public Sub NewDoc()
@@ -108,13 +126,13 @@ Try: On Error GoTo Finally
     Dim c As Long
     s = BinaryReadString(FNr): c = CLng(s)
     Dim i As Long
-    Dim IP As IPAddressV4
+    Dim ip As IPAddressV4
     'If c > 0 Then Set IPAddresses = New IPAddresses
     For i = 0 To c - 1
         s = BinaryReadString(FNr)
-        Set IP = New IPAddressV4
-        IP.ReadFromStr s
-        m_Doc.IPAddresses_Add IP
+        Set ip = New IPAddressV4
+        ip.ReadFromStr s
+        m_Doc.IPAddresses_Add ip
     Next
     
 Finally:
@@ -136,11 +154,11 @@ Try: On Error GoTo Finally
     BinaryWriteString FNr, CStr(m_Doc.StartIPb4)
     BinaryWriteString FNr, CStr(m_Doc.IPAddresses.Count)
     Dim i As Long
-    Dim IP As IPAddressV4
+    Dim ip As IPAddressV4
     Dim s As String
     For i = 1 To m_Doc.IPAddresses.Count '- 1
-        Set IP = m_Doc.IPAddresses.ItemI(i)
-        s = IP.WriteToStr
+        Set ip = m_Doc.IPAddresses.ItemI(i)
+        s = ip.WriteToStr
         BinaryWriteString FNr, s
     Next
 Finally:
@@ -150,14 +168,14 @@ Finally:
     End If
 End Sub
 Private Sub BinaryWriteString(aFNr As Integer, s As String)
-    Dim L As Long: L = Len(s)
-    Put aFNr, , L
+    Dim l As Long: l = Len(s)
+    Put aFNr, , l
     Put aFNr, , s
 End Sub
 Private Function BinaryReadString(aFNr As Integer) As String
-    Dim L As Long, s As String
-    Get aFNr, , L
-    s = Space(L)
+    Dim l As Long, s As String
+    Get aFNr, , l
+    s = Space(l)
     Get aFNr, , s
     BinaryReadString = s
 End Function
