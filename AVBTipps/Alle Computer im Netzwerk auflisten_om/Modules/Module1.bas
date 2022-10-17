@@ -168,7 +168,7 @@ Public Function EnumServer(lServerType As Long) As ListOfServer
     Dim yServer() As Byte
     Dim SrvList As ListOfServer
     
-    yServer = MakeServerName(ByVal "")
+    yServer = MakeServerName("")
     lPreferedMaxLen = 65536
     
     nRet = NERR_MoreData
@@ -327,8 +327,8 @@ Public Function LongEnumUsers(Server As String) As ListOfUserExt
     
 End Function
 
-Public Function MakeServerName(ByVal ServerName As String)
-    Dim yServer() As Byte
+Public Function MakeServerName(ByVal ServerName As String) As String
+    Dim yServer As String '() As Byte
     
     If ServerName <> "" Then
         If InStr(1, ServerName, "\\") = 0 Then
@@ -367,11 +367,11 @@ Public Function NetTimeToVbTime(NetDate As Long) As Double
     
     Const BaseDate# = 25569   'DateSerial(1970, 1, 1)
     Const SecsPerDay# = 86400
-    Dim Tmp As Double
+    Dim tmp As Double
     
-    Tmp = BaseDate + (CDbl(NetDate) / SecsPerDay)
-    If Tmp <> BaseDate Then
-        NetTimeToVbTime = Tmp
+    tmp = BaseDate + (CDbl(NetDate) / SecsPerDay)
+    If tmp <> BaseDate Then
+        NetTimeToVbTime = tmp
     End If
     'warum nicht date zurückgeben?
 End Function

@@ -1,13 +1,13 @@
 VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
-Begin VB.Form frmUserView 
+Begin VB.Form FUserView 
    BorderStyle     =   1  'Fest Einfach
-   Caption         =   "Form1"
+   Caption         =   "FUserView"
    ClientHeight    =   6240
    ClientLeft      =   795
    ClientTop       =   1080
    ClientWidth     =   8535
-   Icon            =   "frmUserView.frx":0000
+   Icon            =   "FUserView.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
@@ -16,7 +16,7 @@ Begin VB.Form frmUserView
    Begin VB.CommandButton Command1 
       Height          =   375
       Left            =   120
-      Picture         =   "frmUserView.frx":030A
+      Picture         =   "FUserView.frx":030A
       Style           =   1  'Grafisch
       TabIndex        =   2
       Top             =   120
@@ -72,11 +72,11 @@ Begin VB.Form frmUserView
       BeginProperty Images {2C247F25-8591-11D1-B16A-00C0F0283628} 
          NumListImages   =   2
          BeginProperty ListImage1 {2C247F27-8591-11D1-B16A-00C0F0283628} 
-            Picture         =   "frmUserView.frx":0454
+            Picture         =   "FUserView.frx":0454
             Key             =   ""
          EndProperty
          BeginProperty ListImage2 {2C247F27-8591-11D1-B16A-00C0F0283628} 
-            Picture         =   "frmUserView.frx":05AE
+            Picture         =   "FUserView.frx":05AE
             Key             =   ""
          EndProperty
       EndProperty
@@ -116,7 +116,7 @@ Begin VB.Form frmUserView
       EndProperty
    End
 End
-Attribute VB_Name = "frmUserView"
+Attribute VB_Name = "FUserView"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
