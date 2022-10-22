@@ -1,8 +1,9 @@
 VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
+Object = "{248DD890-BB45-11CF-9ABC-0080C7E7B78D}#1.0#0"; "MSWINSCK.OCX"
 Begin VB.Form frmMain 
    BorderStyle     =   5  'Änderbares Werkzeugfenster
-   Caption         =   "AV - Bremen"
+   Caption         =   "Network-Tool"
    ClientHeight    =   7395
    ClientLeft      =   120
    ClientTop       =   390
@@ -15,6 +16,13 @@ Begin VB.Form frmMain
    ScaleWidth      =   801
    ShowInTaskbar   =   0   'False
    StartUpPosition =   3  'Windows-Standard
+   Begin MSWinsockLib.Winsock Winsock1 
+      Left            =   1080
+      Top             =   0
+      _ExtentX        =   741
+      _ExtentY        =   741
+      _Version        =   393216
+   End
    Begin VB.CommandButton BtnScan 
       Caption         =   "Scan"
       Height          =   375
@@ -113,7 +121,7 @@ Begin VB.Form frmMain
       Left            =   1320
       TabIndex        =   2
       Top             =   120
-      Width           =   7005
+      Width           =   9405
    End
 End
 Attribute VB_Name = "frmMain"
@@ -127,17 +135,56 @@ Private sDomain As String
 Private tCount As Long
 Private lTime As Long
 
+
+Private Sub Form_Unload(Cancel As Integer)
+    Call FormPosition_Put(Me)
+End Sub
+
+Private Sub Form_Resize()
+    
+'    Const lSize As Long = 7515
+'    'Const lSize As Long = 5715
+'
+'    If Me.Width > lSize Then
+'        Me.Move Me.Left, Me.Top, lSize
+'        Exit Sub
+'    End If
+'
+'    If Me.Width < lSize Then
+'        Me.Move Me.Left, Me.Top, lSize
+'        Exit Sub
+'    End If
+'
+'    lblStatus.Move 2, 2, Me.ScaleWidth - 2, 15
+'    pgWait.Move 2, Me.ScaleHeight - 8, Me.ScaleWidth - 2, 8
+'    lvClients.Move 2, lblStatus.Top + lblStatus.Height + 2, Me.ScaleWidth - 2, Me.ScaleHeight - 27
+    Dim brdr As Single: brdr = 3
+    Dim L As Single: L = brdr
+    Dim t As Single: t = brdr
+    Dim w As Single: w = BtnScan.Width
+    Dim h As Single: h = BtnScan.Height
+    If w > 0 And h > 0 Then Me.BtnScan.Move L, t, w, h
+    
+    t = t + h + brdr
+    w = Me.ScaleWidth - L - brdr
+    h = pgWait.Height
+    If w > 0 And h > 0 Then Me.pgWait.Move L, t, w, h
+    
+    t = t + h + brdr
+    h = Me.ScaleHeight - t - brdr
+    If w > 0 And h > 0 Then Me.lvClients.Move L, t, w, h
+End Sub
+
 Private Sub BtnScan_Click()
-    
+Try: On Error GoTo Catch
     lTime = 30 'Minuten
-
-    'Call FormPosition_Get(Me)
-
-    Dim objWshNet As Object
     
-    Set objWshNet = CreateObject("Wscript.Network")
+    'Call FormPosition_Get(Me)
+    
+    Dim objWshNet As Object: Set objWshNet = CreateObject("Wscript.Network")
     
     sDomain = objWshNet.userdomain
+    lblStatus.Caption = "Domain: " & sDomain
     
     Set objWshNet = Nothing
     
@@ -152,74 +199,69 @@ Private Sub BtnScan_Click()
     End With
     
     If sDomain <> vbNullString Then
-
+        lblStatus.Caption = "Domain: " & sDomain
+        DoEvents
         'If ListDhcpServer = True Then
             
             If ListComputer = True Then
-
+                
                 If GetIPFromHost = True Then
-
+                    
                     If ClientPing = True Then
-
+                        
                         lblStatus.Caption = "Nächster scan in: " & CStr(lTime) & " Minuten."
-
+                        
                         tReadNew.Enabled = True
-
+                        
                         pgWait.Max = lTime
                         pgWait.Min = 0
                         pgWait.Value = 0
-
+                        
                     End If
-
+                    
                 End If
-
+                
             End If
-
+            
         'End If
-
+        
     End If
-
+    
     MousePointer = vbDefault
-
+    Exit Sub
+Catch:
+    ErrHandler "BtnScan_Click", "Domain: " & sDomain, True
 End Sub
 
 Private Function ListComputer() As Boolean
     
-    Dim xItem As ListItem
-    Dim sAttributes As String
-    Dim sBase As String
-    Dim oCommand As Object
-    Dim oConnection As Object
-    Dim sFilter As String
-    Dim oRecordset As Object
-    Dim sResult As String
-    Dim oRootDSE As Object
-    Dim sScope As String
-    Dim sSort As String
-    Dim sDomain As String
-    Dim bRet As Boolean
     
-    bRet = False
+    'Dim sResult As String
+    Dim bRet As Boolean ': bRet = False
     
-    Set oConnection = CreateObject("ADODB.Connection")
-    Set oCommand = CreateObject("ADODB.Command")
 Try: On Error GoTo Catch
-    Set oRootDSE = GetObject("LDAP://RootDSE")
     
-    sDomain = oRootDSE.Get("DefaultNamingContext")
- 
-    sBase = "<LDAP://" & sDomain & ">;"
+    Dim oConnection As Object: Set oConnection = CreateObject("ADODB.Connection")
+    Dim oCommand    As Object:    Set oCommand = CreateObject("ADODB.Command")
+    Dim oRootDSE    As Object:    Set oRootDSE = GetObject("LDAP://RootDSE")
+    
+    Dim sDomain     As String:         sDomain = oRootDSE.Get("DefaultNamingContext")
+    
+    lblStatus.Caption = "Domain: " & sDomain
+    DoEvents
+    
+    Dim sBase As String: sBase = "<LDAP://" & sDomain & ">;"
     
     ' Filter, nur Clients mit H*-* auflisten!
-    sFilter = "(&(objectCategory=computer)(Name=*));"
+    Dim sFilter As String: sFilter = "(&(objectCategory=computer)(Name=*));"
     
     ' alle Clients!
     'sFilter = "(&(objectCategory=computer));"
     
-    sAttributes = "Name;"
-    sScope = "SubTree "
-    sSort = "Name"
- 
+    Dim sAttributes As String: sAttributes = "Name;"
+    Dim sScope      As String:      sScope = "SubTree "
+    Dim sSort       As String:       sSort = "Name"
+    
     oConnection.Provider = "ADsDSOObject"
     oConnection.Open "Active Directory Provider"
     
@@ -227,17 +269,18 @@ Try: On Error GoTo Catch
     oCommand.Properties("Sort On") = sSort
     oCommand.Properties("Page Size") = 1000
     oCommand.CommandText = sBase & sFilter & sAttributes & sScope
- 
-    Set oRecordset = oCommand.Execute
- 
+    
+    Dim oRecordset As Object: Set oRecordset = oCommand.Execute
+    
+    Dim xItem As ListItem
     If oRecordset.Recordcount < 1 Then
-    
+        '
     Else
-    
+        
         oRecordset.MoveFirst
         
         Do Until oRecordset.EOF
-        
+            
             Set xItem = lvClients.ListItems.Add(, , oRecordset.Fields("Name").Value)
             xItem.SmallIcon = 4
             oRecordset.MoveNext
@@ -245,28 +288,30 @@ Try: On Error GoTo Catch
         Loop
         
     End If
- 
+    
     oRecordset.Close
     oConnection.Close
- 
+    
     Set oCommand = Nothing
     Set oConnection = Nothing
     Set oRecordset = Nothing
     Set oRootDSE = Nothing
     
     If lvClients.ListItems.Count > 0 Then
-    
+        
         bRet = True
-    
+        
     End If
     
     ListComputer = bRet
     Exit Function
 Catch:
-    MsgBox Err.Number & vbCrLf & Err.Description
+    ErrHandler "ListComputer", "Domain: " & sDomain, True
 End Function
 
 Private Function GetIPFromHost() As Boolean
+
+Try: On Error GoTo Catch
 
     Dim lItem As Long
     Dim lCount As Long
@@ -306,9 +351,15 @@ Private Function GetIPFromHost() As Boolean
 
     GetIPFromHost = True
     
+    Exit Function
+Catch:
+    ErrHandler "GetIPFromHost", , True
 End Function
 
 Private Function ClientPing() As Boolean
+
+Try: On Error GoTo Catch
+
 
     Dim lItem As Long
     Dim lCount As Long
@@ -377,55 +428,27 @@ Private Function ClientPing() As Boolean
     
     ClientPing = True
     
+    Exit Function
+Catch:
+    ErrHandler "ClientPing", , True
 End Function
 
 Function GetUser(ByVal sComputer As String) As String
+Try: On Error GoTo Catch
+    'Dim strRet As String
+    'Dim lngItem As Long
+    'Dim lngCount As Long
     
-    Dim strRet As String
-    Dim lngItem As Long
-    Dim lngCount As Long
-    
-    Call modMain.LoggedOnUser("\\" & sComputer)
-    GetUser = modMain.Users(0).wkui1_username
-    
+    Call MMain.LoggedOnUser("\\" & sComputer)
+    GetUser = MMain.Users(0).wkui1_username
+    Exit Function
+Catch:
+    ErrHandler "GetUser", , True
 End Function
 
-Private Sub Form_Resize()
-    
-'    Const lSize As Long = 7515
-'    'Const lSize As Long = 5715
-'
-'    If Me.Width > lSize Then
-'        Me.Move Me.Left, Me.Top, lSize
-'        Exit Sub
-'    End If
-'
-'    If Me.Width < lSize Then
-'        Me.Move Me.Left, Me.Top, lSize
-'        Exit Sub
-'    End If
-'
-'    lblStatus.Move 2, 2, Me.ScaleWidth - 2, 15
-'    pgWait.Move 2, Me.ScaleHeight - 8, Me.ScaleWidth - 2, 8
-'    lvClients.Move 2, lblStatus.Top + lblStatus.Height + 2, Me.ScaleWidth - 2, Me.ScaleHeight - 27
-    Dim brdr As Single: brdr = 3
-    Dim L As Single: L = brdr
-    Dim T As Single: T = brdr
-    Dim W As Single: W = BtnScan.Width
-    Dim H As Single: H = BtnScan.Height
-    If W > 0 And H > 0 Then Me.BtnScan.Move L, T, W, H
-    
-    T = T + H + brdr
-    W = Me.ScaleWidth - L - brdr
-    H = pgWait.Height
-    If W > 0 And H > 0 Then Me.pgWait.Move L, T, W, H
-    
-    T = T + H + brdr
-    H = Me.ScaleHeight - T - brdr
-    If W > 0 And H > 0 Then Me.lvClients.Move L, T, W, H
-End Sub
 
 Private Sub ReRead()
+Try: On Error GoTo Catch
     
     tReadNew.Enabled = False
     Call ClientPing
@@ -435,18 +458,22 @@ Private Sub ReRead()
     pgWait.Min = 0
     pgWait.Value = 0
     tReadNew.Enabled = True
-
-End Sub
-
-Private Sub Form_Unload(Cancel As Integer)
-    Call FormPosition_Put(Me)
+    
+    Exit Sub
+Catch:
+    ErrHandler "ReRead", , True
 End Sub
 
 Private Sub lblStatus_DblClick()
+Try: On Error GoTo Catch
     Call ReRead
+    Exit Sub
+Catch:
+    ErrHandler "lblStatus_DblClick", , True
 End Sub
 
 Private Sub lvClients_ColumnClick(ByVal ColumnHeader As MSComctlLib.ColumnHeader)
+Try: On Error GoTo Catch
     
     With lvClients
         .Sorted = True ' Sortierte Anzeige
@@ -457,10 +484,13 @@ Private Sub lvClients_ColumnClick(ByVal ColumnHeader As MSComctlLib.ColumnHeader
             .SortOrder = lvwAscending
         End If
     End With
-
+    Exit Sub
+Catch:
+    ErrHandler "lvClients_ColumnClick", , True
 End Sub
 
 Private Sub tReadNew_Timer()
+Try: On Error GoTo Catch
 
     tCount = tCount + 1
     pgWait.Value = tCount
@@ -475,5 +505,34 @@ Private Sub tReadNew_Timer()
         tCount = 0
         Call ReRead
     End If
-
+    
+    Exit Sub
+Catch:
+    ErrHandler "tReadNew_Timer", , True
 End Sub
+
+''copy this same function to every class, form or module
+''the name of the class or form will be added automatically
+''in standard-modules the function "TypeName(Me)" will not work, so simply replace it with the name of the Module
+'' v ############################## v '   Local ErrHandler   ' v ############################## v '
+Private Function ErrHandler(ByVal FuncName As String, _
+                            Optional ByVal AddInfo As String, _
+                            Optional WinApiError, _
+                            Optional bLoud As Boolean = True, _
+                            Optional bErrLog As Boolean = True, _
+                            Optional vbDecor As VbMsgBoxStyle = vbOKCancel, _
+                            Optional bRetry As Boolean) As VbMsgBoxResult
+    
+    If bRetry Then
+        
+        ErrHandler = MessErrorRetry(TypeName(Me), FuncName, AddInfo, WinApiError, bErrLog)
+        
+    Else
+        
+        ErrHandler = MessError(TypeName(Me), FuncName, AddInfo, WinApiError, bLoud, bErrLog, vbDecor)
+        
+    End If
+    
+End Function
+
+

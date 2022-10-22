@@ -10,6 +10,14 @@ Begin VB.Form FrmIPPingScanner
    ScaleHeight     =   6375
    ScaleWidth      =   12495
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton Command1 
+      Caption         =   "Command1"
+      Height          =   375
+      Left            =   10800
+      TabIndex        =   11
+      Top             =   0
+      Width           =   1575
+   End
    Begin VB.PictureBox Panel1 
       Appearance      =   0  '2D
       BackColor       =   &H80000005&
@@ -233,6 +241,11 @@ Attribute Splitter1.VB_VarHelpID = -1
 Private Splitter2 As Splitter
 Private mnuPopListBox As ListBox
 
+Private Sub Command1_Click()
+    Dim ipv6 As IPAddressV6: Set ipv6 = MNew.IPAddressV6(1, 2, 3, 4, 5, 6, 7, 8)
+    MsgBox ipv6.ToStr
+End Sub
+
 'Private Sub Command1_Click()
 '    Dim sIP As String: sIP = "192.168.178.20"
 '    Dim sName As String
@@ -273,7 +286,7 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
     End If
 End Sub
 Private Sub Form_Resize()
-    Dim l As Single, T As Single, W As Single, H As Single
+    Dim L As Single, T As Single, W As Single, H As Single
 
 '    L = List1.Left: T = List1.Top: W = List1.Width: H = Me.ScaleHeight - T
 '    If W > 0 And H > 0 Then List1.Move L, T, W, H
@@ -282,10 +295,10 @@ Private Sub Form_Resize()
 '    L = TxtIPInfo.Left: T = TxtIPInfo.Top: W = Me.ScaleWidth - L
 '    If W > 0 And H > 0 Then TxtIPInfo.Move L, T, W, H
     Dim brdr As Single: 'brdr = 8 * Screen.TwipsPerPixelX
-    l = 0: T = Panel1.Top
-    W = Me.ScaleWidth - l
+    L = 0: T = Panel1.Top
+    W = Me.ScaleWidth - L
     H = Me.ScaleHeight - T
-    If W > 0 And H > 0 Then Panel1.Move l, T, W, H
+    If W > 0 And H > 0 Then Panel1.Move L, T, W, H
     
 End Sub
 

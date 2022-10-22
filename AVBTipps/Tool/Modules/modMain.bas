@@ -1,4 +1,4 @@
-Attribute VB_Name = "modMain"
+Attribute VB_Name = "MMain"
 Option Explicit
 
 'Konstanten
@@ -132,6 +132,7 @@ Public Users() As WKSTA_USER_INFO_1_STR
 Private DhcpServer() As String
          
 Public Function ListDhcpServer() As Boolean
+Try: On Error GoTo Catch
 
     Dim bRet As Boolean
     Dim lItem As Long
@@ -163,9 +164,13 @@ Public Function ListDhcpServer() As Boolean
     End If
 
     ListDhcpServer = bRet
+    Exit Function
+Catch:
+    ErrHandler "ListDhcpServer", , True
 End Function
 
 Public Function GetMacFromClient(ByVal sClientIP As String) As String
+Try: On Error GoTo Catch
 
     Dim lItem As Long
     Dim lCount As Long
@@ -219,13 +224,16 @@ Public Function GetMacFromClient(ByVal sClientIP As String) As String
     End If
     
     GetMacFromClient = sRet
-
+    Exit Function
+Catch:
+    ErrHandler "GetMacFromClient", , True
 End Function
          
 Public Sub FormPosition_Get(ByRef F As Form)
+Try: On Error GoTo Catch
 
     Dim buf As String
-    Dim l As Integer, t As Integer
+    Dim L As Integer, t As Integer
     Dim h As Integer, w As Integer
     Dim pos As Integer
 
@@ -236,7 +244,7 @@ Public Sub FormPosition_Get(ByRef F As Form)
         F.Move (Screen.Width - F.Width) \ 2, (Screen.Height - F.Height) \ 2
     Else
         pos = InStr(buf, ",")
-        l = CInt(Left(buf, pos - 1))
+        L = CInt(Left(buf, pos - 1))
         buf = Mid(buf, pos + 1)
         pos = InStr(buf, ",")
         t = CInt(Left(buf, pos - 1))
@@ -244,18 +252,25 @@ Public Sub FormPosition_Get(ByRef F As Form)
         pos = InStr(buf, ",")
         w = CInt(Left(buf, pos - 1))
         h = CInt(Mid(buf, pos + 1))
-        F.Move l, t, w, h
+        F.Move L, t, w, h
     End If
+    Exit Sub
+Catch:
+    ErrHandler "FormPosition_Get", , True
 End Sub
 
 Public Sub FormPosition_Put(ByRef F As Form)
+Try: On Error GoTo Catch
     Dim buf As String
     buf = F.Left & "," & F.Top & "," & F.Width & "," & F.Height
     SaveSetting "AvBremenLV", "FormPosition", "Position", buf
+    Exit Sub
+Catch:
+    ErrHandler "FormPosition_Put", , True
 End Sub
          
 Public Function SimplePing(ByVal sIPadr As String, Optional ByVal lMaxHops As Long = 1) As Boolean
-
+Try: On Error GoTo Catch
     Dim lIPadr      As Long
     Dim lHopsCount  As Long
     Dim lRTT        As Long
@@ -276,11 +291,13 @@ Public Function SimplePing(ByVal sIPadr As String, Optional ByVal lMaxHops As Lo
 '        SimplePing = False
 '
 '    End If
-    
+    Exit Function
+Catch:
+    ErrHandler "SimplePing", , True
 End Function
          
 Public Function GetPDCName() As String
-
+Try: On Error GoTo Catch
     Dim lpBuffer As Long
     Dim nRet As Long
     Dim yServer() As Byte
@@ -297,11 +314,13 @@ Public Function GetPDCName() As String
     If lpBuffer Then Call NetApiBufferFree(lpBuffer)
     
     GetPDCName = sLocal
-    
+    Exit Function
+Catch:
+    ErrHandler "GetPDCName", , True
 End Function
 
 Public Function MakeServerName(ByVal ServerName As String)
-
+Try: On Error GoTo Catch
     Dim yServer() As Byte
     
     If ServerName <> "" Then
@@ -312,10 +331,13 @@ Public Function MakeServerName(ByVal ServerName As String)
     
     yServer = ServerName & vbNullChar
     MakeServerName = yServer
-    
+    Exit Function
+Catch:
+    ErrHandler "MakeServerName", , True
 End Function
 
 Public Function PointerToStringW(lpStringW As Long) As String
+Try: On Error GoTo Catch
 
     Dim buffer() As Byte
     Dim nLen As Long
@@ -329,10 +351,13 @@ Public Function PointerToStringW(lpStringW As Long) As String
             PointerToStringW = buffer
         End If
     End If
-    
+    Exit Function
+Catch:
+    ErrHandler "PointerToStringW", , True
 End Function
 
 Public Function HostName2IP(ByVal sAddr As String, Optional sDnsServers As String) As String
+Try: On Error GoTo Catch
     
     Dim pRecord     As Long
     Dim pNext       As Long
@@ -342,9 +367,9 @@ Public Function HostName2IP(ByVal sAddr As String, Optional sDnsServers As Strin
     Dim laServers() As Long
     Dim pServers    As Long
     Dim sName       As String
-
-    If LenB(sDnsServers) <> 0 Then
     
+    If LenB(sDnsServers) <> 0 Then
+        
         vSplit = Split(sDnsServers)
         
         ReDim laServers(0 To UBound(vSplit) + 1)
@@ -378,83 +403,91 @@ Public Function HostName2IP(ByVal sAddr As String, Optional sDnsServers As Strin
                 End If
                 
                 HostName2IP = HostName2IP & sName
-            
+                
             End If
             
             pNext = uRecord.pNext
-        
+            
             DoEvents
             
         Loop
         
         Call DnsRecordListFree(pRecord, DnsFreeRecordList)
-    
+        
     End If
+    
+    Exit Function
+Catch:
+    ErrHandler "HostName2IP", , True
 End Function
 
 Public Function LoggedOnUser(strServer As String) As Long
+Try: On Error GoTo Catch
+    Dim bufptr          As Long
+    Dim dwServer        As Long
+    Dim dwEntriesread   As Long
+    Dim dwTotalentries  As Long
+    Dim dwResumehandle  As Long
+    Dim nStatus         As Long
+    Dim nStructSize     As Long
+    Dim cnt             As Long
+    Dim wui1            As WKSTA_USER_INFO_1
     
-  Dim bufptr          As Long
-  Dim dwServer        As Long
-  Dim dwEntriesread   As Long
-  Dim dwTotalentries  As Long
-  Dim dwResumehandle  As Long
-  Dim nStatus         As Long
-  Dim nStructSize     As Long
-  Dim cnt             As Long
-  Dim wui1            As WKSTA_USER_INFO_1
-  
-  'strServer muß mit "\\" beginnen
-  'bServer = strServer & vbNullString
-  dwServer = StrPtr(strServer)
-  
-  Do
-    'PC Connecten und Liste der angemeldeten User abfragen
-    'MAX_PREFERRED_LENGTH bewirkt das die NetApi32 den BufferSize
-    'selber bestimmt und den Buffer Allociert
-    'Dieser Aufruf erzwingt die Struktur Level 1, alternativ kann
-    'auch Level 0 genutzt werden der nur den Benutzernamen ermittelt
-    nStatus = NetWkstaUserEnum(dwServer, 1, bufptr, MAX_PREFERRED_LENGTH, _
-      dwEntriesread, dwTotalentries, dwResumehandle)
+    'strServer muß mit "\\" beginnen
+    'bServer = strServer & vbNullString
+    dwServer = StrPtr(strServer)
     
-    ReDim Users(dwTotalentries)
-    
-    'wieviel insgesamt
-    If nStatus = NERR_SUCCESS Or nStatus = ERROR_MORE_DATA Then
-      
-      If dwEntriesread > 0 Then
+    Do
+        'PC Connecten und Liste der angemeldeten User abfragen
+        'MAX_PREFERRED_LENGTH bewirkt das die NetApi32 den BufferSize
+        'selber bestimmt und den Buffer Allociert
+        'Dieser Aufruf erzwingt die Struktur Level 1, alternativ kann
+        'auch Level 0 genutzt werden der nur den Benutzernamen ermittelt
+        nStatus = NetWkstaUserEnum(dwServer, 1, bufptr, MAX_PREFERRED_LENGTH, dwEntriesread, dwTotalentries, dwResumehandle)
         
-        ' Länge ermitteln damit die richtige Anzahl Bytes aus dem Speicher kopiert wird
-        nStructSize = LenB(wui1)
+        ReDim Users(dwTotalentries)
         
-        For cnt = 0 To dwEntriesread - 1
+        'wieviel insgesamt
+        If nStatus = NERR_SUCCESS Or nStatus = ERROR_MORE_DATA Then
           
-          'Alle gelesenen User in die Struktur kopieren
-           CopyMemory wui1, ByVal bufptr + (nStructSize * cnt), nStructSize
-           
-           'Alle Stringpointer als Strings in die neue Struktur kpoieren
-           Users(cnt).wkui1_username = PtrStr(wui1.wkui1_username)
-           Users(cnt).wkui1_logon_domain = PtrStr(wui1.wkui1_logon_domain)
-           Users(cnt).wkui1_logon_server = PtrStr(wui1.wkui1_logon_server)
-           Users(cnt).wkui1_oth_domains = PtrStr(wui1.wkui1_oth_domains)
-           
-           DoEvents
-        
-        Next cnt
+            If dwEntriesread > 0 Then
+              
+              ' Länge ermitteln damit die richtige Anzahl Bytes aus dem Speicher kopiert wird
+              nStructSize = LenB(wui1)
+              
+              For cnt = 0 To dwEntriesread - 1
+                
+                'Alle gelesenen User in die Struktur kopieren
+                 CopyMemory wui1, ByVal bufptr + (nStructSize * cnt), nStructSize
+                 
+                 'Alle Stringpointer als Strings in die neue Struktur kpoieren
+                 Users(cnt).wkui1_username = PtrStr(wui1.wkui1_username)
+                 Users(cnt).wkui1_logon_domain = PtrStr(wui1.wkui1_logon_domain)
+                 Users(cnt).wkui1_logon_server = PtrStr(wui1.wkui1_logon_server)
+                 Users(cnt).wkui1_oth_domains = PtrStr(wui1.wkui1_oth_domains)
+                 
+                 DoEvents
+              
+              Next cnt
+              
+            End If
+          
+      Else
+      
+        LoggedOnUser = nStatus
       
       End If
+    Loop While nStatus = ERROR_MORE_DATA
+
+    NetApiBufferFree bufptr
     
-    Else
-    
-      LoggedOnUser = nStatus
-    
-    End If
-  Loop While nStatus = ERROR_MORE_DATA
-  
-  NetApiBufferFree bufptr
+    Exit Function
+Catch:
+    ErrHandler "LoggedOnUser", , True
 End Function
 
 Private Function PtrStr(ByVal lpString As Long) As String
+Try: On Error GoTo Catch
   Dim buff() As Byte
   Dim nSize As Long
   
@@ -469,16 +502,21 @@ Private Function PtrStr(ByVal lpString As Long) As String
       PtrStr = buff
     End If
   End If
+    
+    Exit Function
+Catch:
+    ErrHandler "PtrStr", , True
 End Function
 
 Private Function CheckPort(ByVal Server As String, ByVal Port As Long) As Boolean
+Try: On Error GoTo Catch
 
     Dim bolRet As Boolean
-    Dim SockObject As Object
+    Dim SockObject As Winsock 'Object
 
-    Set SockObject = CreateObject("MSWinsock.Winsock.1")
+    Set SockObject = frmMain.Winsock1 ' CreateObject("MSWinsock.Winsock.1")
 
-    SockObject.Protocol = 0
+    SockObject.Protocol = sckTCPProtocol ' = 0
     SockObject.Close
     SockObject.Connect Server, Port
 
@@ -499,29 +537,35 @@ Private Function CheckPort(ByVal Server As String, ByVal Port As Long) As Boolea
     Set SockObject = Nothing
 
     CheckPort = bolRet
-
+    
+    Exit Function
+Catch:
+    ErrHandler "CheckPort", "Server " & Server & ":" & Port, True
 End Function
 
 Private Sub SleepLong(ByVal lngSeconds As Long)
-
+Try: On Error GoTo Catch
+    
     Dim t As Single, b As Boolean
-
+    
     t = Timer
-
+    
     Do
-
+        
         Sleep 1
-
+        
         DoEvents
-
+        
         b = Timer - t > lngSeconds
-
+        
     Loop Until b
-
+    Exit Sub
+Catch:
+    ErrHandler "SleepLong", , True
 End Sub
 
 Public Sub Pause(ByVal SecsDelay As Single)
-
+Try: On Error GoTo Catch
     Dim TimeOut   As Single
     Dim PrevTimer As Single
 
@@ -537,10 +581,13 @@ Public Sub Pause(ByVal SecsDelay As Single)
         PrevTimer = Timer
 
     Loop
-
+    Exit Sub
+Catch:
+    ErrHandler "Pause", , True
 End Sub
 
 Private Function PtrFromIP(ByVal sIP As String) As Long
+Try: On Error GoTo Catch
 
     Dim tIP As BYTE_IPADDRESS
     Dim sSplit() As String
@@ -556,11 +603,13 @@ Private Function PtrFromIP(ByVal sIP As String) As Long
     Call CopyMemory2(lPtr, tIP, LenB(tIP))
 
     PtrFromIP = lPtr
-
+    Exit Function
+Catch:
+    ErrHandler "PtrFromIP", , True
 End Function
 
-Private Function MacFromPtr(ByRef DBD As DHCP_BINARY_DATA, Optional ByVal sSep As _
-    String = ":") As String
+Private Function MacFromPtr(ByRef DBD As DHCP_BINARY_DATA, Optional ByVal sSep As String = ":") As String
+Try: On Error GoTo Catch
 
     Dim bMac() As Byte
     Dim lItem As Long
@@ -592,6 +641,33 @@ Private Function MacFromPtr(ByRef DBD As DHCP_BINARY_DATA, Optional ByVal sSep A
     Next lItem
 
     MacFromPtr = sTmp
+    Exit Function
+Catch:
+    ErrHandler "MacFromPtr", , True
+End Function
 
+
+''copy this same function to every class, form or module
+''the name of the class or form will be added automatically
+''in standard-modules the function "TypeName(Me)" will not work, so simply replace it with the name of the Module
+'' v ############################## v '   Local ErrHandler   ' v ############################## v '
+Private Function ErrHandler(ByVal FuncName As String, _
+                            Optional ByVal AddInfo As String, _
+                            Optional WinApiError, _
+                            Optional bLoud As Boolean = True, _
+                            Optional bErrLog As Boolean = True, _
+                            Optional vbDecor As VbMsgBoxStyle = vbOKCancel, _
+                            Optional bRetry As Boolean) As VbMsgBoxResult
+    
+    If bRetry Then
+        
+        ErrHandler = MessErrorRetry("MMain", FuncName, AddInfo, WinApiError, bErrLog)
+        
+    Else
+        
+        ErrHandler = MessError("MMain", FuncName, AddInfo, WinApiError, bLoud, bErrLog, vbDecor)
+        
+    End If
+    
 End Function
 

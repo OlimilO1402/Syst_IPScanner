@@ -1,10 +1,17 @@
 Attribute VB_Name = "MNew"
 Option Explicit
 
+Public Function IPAddress(v1, v2, v3, v4, v5, v6, v7, v8) As IPAddress
+    Set IPAddress = New IPAddresses: IPAddress.New_ v1, v2, v3, v4, v5, v6, v7, v8
+End Function
+
 Public Function IPAddressV4(StrLngBytesNewAddress, Optional aName As String) As IPAddressV4
     Set IPAddressV4 = New IPAddressV4: IPAddressV4.New_ StrLngBytesNewAddress, aName
 End Function
 
+Public Function IPAddressV6(ByVal d1 As Integer, ByVal d2 As Integer, ByVal d3 As Integer, ByVal d4 As Integer, ByVal d5 As Integer, ByVal d6 As Integer, ByVal d7 As Integer, ByVal d8 As Integer) As IPAddressV6
+    Set IPAddressV6 = New IPAddressV6: IPAddressV6.New_ d1, d2, d3, d4, d5, d6, d7, d8
+End Function
 Public Function Document(aIPBase As IPAddressV4, aLastIP As IPAddressV4, nSearchIPs As Long, aScanner As IPPingScanner) As Document
     Set Document = New Document: Document.New_ aIPBase, aLastIP, nSearchIPs, aScanner
 End Function
@@ -32,8 +39,8 @@ Public Function PathFileName(ByVal aPathFileName As String, _
     Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
 
-Public Function Min(V1, V2)
-    If V1 < V2 Then Min = V1 Else Min = V2
+Public Function Min(v1, v2)
+    If v1 < v2 Then Min = v1 Else Min = v2
 End Function
     
 'Public Function GetOpenFileName() As String
