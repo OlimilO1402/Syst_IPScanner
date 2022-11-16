@@ -269,11 +269,13 @@ Private Sub Form_Load()
     Splitter2.LeftTopPos = List2.Width
     mnuPopup.Visible = False
 End Sub
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, y As Single)
     If Button = MouseButtonConstants.vbRightButton Then
         PopupMenu mnuopt
     End If
 End Sub
+
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
     If MApp.Doc.IsDataChanged Then
         Dim mbr As VbMsgBoxResult: mbr = MsgBox("Data changed, save it?", vbYesNoCancel)
@@ -285,6 +287,7 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
         End Select
     End If
 End Sub
+
 Private Sub Form_Resize()
     Dim L As Single, T As Single, W As Single, H As Single
 
@@ -332,6 +335,7 @@ Private Sub mnuFileNew_Click()
     'StartIPb4 = 0
     'SearchNIPs = 50
 End Sub
+
 Private Sub mnuFileOpen_Click()
     'Me.FileDialog.FileName = "IPScan" & Now
     Dim OFD As OpenFileDialog: Set OFD = New OpenFileDialog
@@ -340,11 +344,13 @@ Private Sub mnuFileOpen_Click()
     MApp.Doc.IsDataChanged = False
     UpdateView 'MApp.Doc
 End Sub
+
 Private Sub mnuFileSave_Click()
     MApp.FileSave
     'TODO: we should first ask if filesave was True
     MApp.Doc.IsDataChanged = False
 End Sub
+
 Private Sub mnuFileSaveAs_Click()
 'https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/cc144156(v=vs.85)
     Dim SFD As SaveFileDialog: Set SFD = New SaveFileDialog
@@ -461,7 +467,7 @@ Try: On Error GoTo Catch
 'z.B. so:
 '* open Command prompt
 '* get the machine name with: nbtstat --a 192.168.2.77
-'* get the user    name with: net view /domain:puhla.de > c:\ip\ip.txt
+'* get the user    name with: net view /domain:xxxxx.de > c:\ip\ip.txt
     
     GoTo Finally
 Catch:
@@ -552,7 +558,7 @@ End Sub
 Private Sub List1_DblClick()
     LB_DblClick List1
 End Sub
-Private Sub List1_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub List1_MouseDown(Button As Integer, Shift As Integer, X As Single, y As Single)
     Dim btn As MouseButtonConstants: btn = Button
     If btn = vbRightButton Then
         Set mnuPopListBox = List1
@@ -575,7 +581,7 @@ End Sub
 Private Sub List2_DblClick()
     LB_DblClick List2
 End Sub
-Private Sub List2_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub List2_MouseDown(Button As Integer, Shift As Integer, X As Single, y As Single)
     Dim btn As MouseButtonConstants: btn = Button
     If btn = vbRightButton Then
         Set mnuPopListBox = List2

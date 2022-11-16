@@ -27,7 +27,7 @@ Private Sub Class_Initialize()
 End Sub
 
 Friend Sub New_(aIPBase As IPAddressV4, aLastIP As IPAddressV4, nSearchIPs As Long, aScanner As IPPingScanner) ', StartIPb4 As Long)
- Set m_IPBase = aIPBase: Set m_LastIP = aLastIP: m_SearchNIPs = nSearchIPs: Set IPPingScanner = aScanner
+    Set m_IPBase = aIPBase: Set m_LastIP = aLastIP: m_SearchNIPs = nSearchIPs: Set IPPingScanner = aScanner
 End Sub
 
 Public Sub Scan()
