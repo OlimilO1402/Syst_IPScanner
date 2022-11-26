@@ -308,14 +308,14 @@ End Sub
 Public Sub UpdateView()
     Dim Doc As Document: Set Doc = MApp.Doc
     Me.TxtIPBase.Text = Doc.IPBase.ToStr
-    Dim ip As IPAddressV4
+    Dim IP As IpAddress
     Dim i As Long
     For i = 1 To Doc.IPAddresses.Count
-        Set ip = Doc.IPAddresses.ItemI(i)
-        If ip.IsValid Then
-            List2.AddItem ip.IPToStr
+        Set IP = Doc.IPAddresses.ItemI(i)
+        If IP.IsValid Then
+            List2.AddItem IP.IPToStr
         Else
-            List1.AddItem ip.IPToStr
+            List1.AddItem IP.IPToStr
         End If
     Next
     BtnScanNextXXIPs.Caption = "Scan next " & MApp.Doc.SearchNIPs & " IPs"
@@ -392,11 +392,11 @@ Private Sub mnuPopAddPort_Click()
     Dim i As Long: i = mnuPopListBox.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = mnuPopListBox.List(i)
-    Dim aIPV4 As IPAddressV4
+    Dim aIP As IpAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
-        Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
+        Set aIP = MApp.Doc.IPAddresses.Item(s)
         'aIPV4.CallPing
-        TxtIPInfo.Text = aIPV4.ToInfoStr
+        TxtIPInfo.Text = aIP.ToInfoStr
     End If
 End Sub
 
@@ -404,7 +404,7 @@ Private Sub mnuOptPingIP_Click()
     Dim i As Long: i = mnuPopListBox.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = mnuPopListBox.List(i)
-    Dim aIPV4 As IPAddressV4
+    Dim aIPV4 As IpAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         aIPV4.CallPing
@@ -415,7 +415,7 @@ Private Sub mnuOptPingIPport_Click()
     Dim i As Long: i = mnuPopListBox.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = mnuPopListBox.List(i)
-    Dim aIPV4 As IPAddressV4
+    Dim aIPV4 As IpAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         Set aIPV4 = aIPV4.Clone
@@ -438,7 +438,7 @@ End Sub
 Private Sub mnuOptionsUserPCName_Click()
 Try: On Error GoTo Catch
     'den Usernamen und den PC-Namen herausfinden und ins Netzwerk in eine Datei schreiben bzw anhängen
-    Dim ip As IPAddressV4: Set ip = MSocket.GetMyIP
+    Dim IP As IpAddress: Set IP = MSocket.GetMyIP
     Dim un As String:          un = MApp.UserName
     Dim cn As String:          cn = MApp.ComputerName
     Dim hn As String:          hn = MSocket.MyHostName
@@ -455,11 +455,11 @@ Try: On Error GoTo Catch
         End If
     End If
     Dim fc As String
-    fc = "IP-Address: " & ip.ToStr & "; Username: " & un & "; Computername: " & cn & vbCrLf & _
+    fc = "IP-Address: " & IP.ToStr & "; Username: " & un & "; Computername: " & cn & vbCrLf & _
          "Also write to file?"
     If MsgBox(fc, vbOKCancel) = vbCancel Then Exit Sub
     
-    fc = "IP-Address: " & vbTab & ip.ToStr & vbTab & "; Username: " & vbTab & un & vbTab & "; Computername: " & vbTab & cn
+    fc = "IP-Address: " & vbTab & IP.ToStr & vbTab & "; Username: " & vbTab & un & vbTab & "; Computername: " & vbTab & cn
     
     pfn.OpenFile FileMode_Append, FileAccess_Write
     pfn.WriteStr fc
@@ -492,7 +492,7 @@ End Sub
 ' v ############################## v '  Menu mnuInfo  ' v ############################## v '
 
 Private Sub mnuHelpExternalIP_Click()
-    Dim ipv4 As IPAddressV4: Set ipv4 = MNew.IPAddressV4(MApp.GetMyIP)
+    Dim ipv4 As IpAddress: Set ipv4 = MNew.IpAddress(MApp.GetMyIP)
     Dim s As String: s = InputBox("My external IP:", , ipv4.ToStr)
 End Sub
 
@@ -503,7 +503,7 @@ End Sub
 ' ^ ############################## ^ '  Menu mnuInfo  ' ^ ############################## ^ '
 
 Private Sub TxtIPBase_LostFocus()
-    Dim NewBaseIP As IPAddressV4: Set NewBaseIP = MNew.IPAddressV4(TxtIPBase.Text)
+    Dim NewBaseIP As IpAddress: Set NewBaseIP = MNew.IpAddress(TxtIPBase.Text)
     TxtIPBase.Text = NewBaseIP.IPToStr
     Set MApp.Doc.IPBase = NewBaseIP
     MApp.Doc.StartIPb4 = MApp.Doc.IPBase.b1
@@ -529,7 +529,7 @@ Private Sub BtnScanNextXXIPs_Click()
     LblDTime.Caption = "Ready! time: " & Format(dt, "#.00") & " sec"
 End Sub
 
-Private Sub IPPingScanner_FoundIP(aIPV4 As IPAddressV4, out_Cancel As Boolean)
+Private Sub IPPingScanner_FoundIP(aIPV4 As IpAddress, out_Cancel As Boolean)
     If Not MApp.Doc.IPAddresses.Contains(aIPV4.IPToStr) Then
         MApp.Doc.IPAddresses.Add aIPV4
     Else
@@ -549,7 +549,7 @@ End Sub
 Private Sub List1_Click()
     Dim i As Long: i = List1.ListIndex
     If i < 0 Then Exit Sub
-    Dim aIPV4 As IPAddressV4
+    Dim aIPV4 As IpAddress
     If MApp.Doc.IPAddresses.Contains(List1.List(i)) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(List1.List(i))
         TxtIPInfo.Text = aIPV4.ToInfoStr
@@ -570,7 +570,7 @@ Private Sub List2_Click()
     Dim i As Long: i = List2.ListIndex
     Dim s As String: s = List2.List(i)
     If i < 0 Then Exit Sub
-    Dim aIPV4 As IPAddressV4
+    Dim aIPV4 As IpAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         Debug.Print aIPV4.IPToStr
@@ -593,7 +593,7 @@ Private Sub LB_DblClick(aLB As ListBox)
     Dim i As Long: i = aLB.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = aLB.List(i)
-    Dim aIPV4 As IPAddressV4
+    Dim aIPV4 As IpAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         If mnuOptDllOrNslookupDll.Checked Then

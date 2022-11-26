@@ -34,9 +34,9 @@ End Property
 Public Function GetMyIP() As String
     Dim s As String: s = MNew.InternetURL("http://checkip.dyndns.org").Read
     Dim i As Long:   i = InStr(1, s, "IP Address: "): If i = 0 Then Exit Function
-    Dim l As Long:   l = InStr(1, s, "</body>"):      If l = 0 Then Exit Function
-    i = i + 12:    l = l - i
-    GetMyIP = Mid(s, i, l)
+    Dim L As Long:   L = InStr(1, s, "</body>"):      If L = 0 Then Exit Function
+    i = i + 12:    L = L - i
+    GetMyIP = Mid(s, i, L)
 End Function
 
 Public Sub NewDoc()
@@ -53,7 +53,7 @@ Public Property Get Doc() As Document
 End Property
 
 Private Function CreateNewDoc() As Document
-    Dim ib As IPAddressV4: Set ib = MNew.IPAddressV4("192.168.178")
+    Dim ib As IpAddress: Set ib = MNew.IPAddressV4("192.168.178")
     Set CreateNewDoc = MNew.Document(ib, ib.Clone, 50, FrmIPPingScanner.IPPingScanner)
 End Function
 Public Property Get FileName() As String
@@ -126,13 +126,13 @@ Try: On Error GoTo Finally
     Dim c As Long
     s = BinaryReadString(FNr): c = CLng(s)
     Dim i As Long
-    Dim ip As IPAddressV4
+    Dim IP As IpAddress
     'If c > 0 Then Set IPAddresses = New IPAddresses
     For i = 0 To c - 1
         s = BinaryReadString(FNr)
-        Set ip = New IPAddressV4
-        ip.ReadFromStr s
-        m_Doc.IPAddresses_Add ip
+        Set IP = New IpAddress
+        IP.ReadFromStr s
+        m_Doc.IPAddresses_Add IP
     Next
     
 Finally:
@@ -154,11 +154,11 @@ Try: On Error GoTo Finally
     BinaryWriteString FNr, CStr(m_Doc.StartIPb4)
     BinaryWriteString FNr, CStr(m_Doc.IPAddresses.Count)
     Dim i As Long
-    Dim ip As IPAddressV4
+    Dim IP As IpAddress
     Dim s As String
     For i = 1 To m_Doc.IPAddresses.Count '- 1
-        Set ip = m_Doc.IPAddresses.ItemI(i)
-        s = ip.WriteToStr
+        Set IP = m_Doc.IPAddresses.ItemI(i)
+        s = IP.WriteToStr
         BinaryWriteString FNr, s
     Next
 Finally:
@@ -168,14 +168,14 @@ Finally:
     End If
 End Sub
 Private Sub BinaryWriteString(aFNr As Integer, s As String)
-    Dim l As Long: l = Len(s)
-    Put aFNr, , l
+    Dim L As Long: L = Len(s)
+    Put aFNr, , L
     Put aFNr, , s
 End Sub
 Private Function BinaryReadString(aFNr As Integer) As String
-    Dim l As Long, s As String
-    Get aFNr, , l
-    s = Space(l)
+    Dim L As Long, s As String
+    Get aFNr, , L
+    s = Space(L)
     Get aFNr, , s
     BinaryReadString = s
 End Function

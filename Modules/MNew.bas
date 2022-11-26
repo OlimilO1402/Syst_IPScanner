@@ -1,18 +1,37 @@
 Attribute VB_Name = "MNew"
 Option Explicit
+'
+'Public Function IPAddress(v1, v2, v3, v4, v5, v6, v7, v8) As IPAddress
+'    Set IPAddress = New IPAddresses: IPAddress.New_ v1, v2, v3, v4, v5, v6, v7, v8
+'End Function
+'
+'Public Function IPAddressV4(StrLngBytesNewAddress, Optional aName As String) As IPAddressV4
+'    Set IPAddressV4 = New IPAddressV4: IPAddressV4.New_ StrLngBytesNewAddress, aName
+'End Function
+'
+'Public Function IPAddressV6(ByVal d1 As Integer, ByVal d2 As Integer, ByVal d3 As Integer, ByVal d4 As Integer, ByVal d5 As Integer, ByVal d6 As Integer, ByVal d7 As Integer, ByVal d8 As Integer) As IPAddressV6
+'    Set IPAddressV6 = New IPAddressV6: IPAddressV6.New_ d1, d2, d3, d4, d5, d6, d7, d8
+'End Function
 
-Public Function IPAddress(v1, v2, v3, v4, v5, v6, v7, v8) As IPAddress
-    Set IPAddress = New IPAddresses: IPAddress.New_ v1, v2, v3, v4, v5, v6, v7, v8
+
+Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8) As IPAddress
+    Set IPAddress = New IPAddresses: IPAddress.New_ i1, i2, i3, i4, i5, i6, i7, i8
 End Function
 
-Public Function IPAddressV4(StrLngBytesNewAddress, Optional aName As String) As IPAddressV4
-    Set IPAddressV4 = New IPAddressV4: IPAddressV4.New_ StrLngBytesNewAddress, aName
+Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
+    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
 End Function
 
-Public Function IPAddressV6(ByVal d1 As Integer, ByVal d2 As Integer, ByVal d3 As Integer, ByVal d4 As Integer, ByVal d5 As Integer, ByVal d6 As Integer, ByVal d7 As Integer, ByVal d8 As Integer) As IPAddressV6
-    Set IPAddressV6 = New IPAddressV6: IPAddressV6.New_ d1, d2, d3, d4, d5, d6, d7, d8
+Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port As Integer) As IPAddress
+    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
 End Function
-Public Function Document(aIPBase As IPAddressV4, aLastIP As IPAddressV4, nSearchIPs As Long, aScanner As IPPingScanner) As Document
+
+Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer) As IPAddress
+    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8
+End Function
+
+
+Public Function Document(aIPBase As IPAddress, aLastIP As IPAddress, nSearchIPs As Long, aScanner As IPPingScanner) As Document
     Set Document = New Document: Document.New_ aIPBase, aLastIP, nSearchIPs, aScanner
 End Function
     
@@ -39,8 +58,8 @@ Public Function PathFileName(ByVal aPathFileName As String, _
     Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
 
-Public Function Min(v1, v2)
-    If v1 < v2 Then Min = v1 Else Min = v2
+Public Function Min(V1, V2)
+    If V1 < V2 Then Min = V1 Else Min = V2
 End Function
     
 'Public Function GetOpenFileName() As String

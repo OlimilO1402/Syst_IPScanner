@@ -47,26 +47,26 @@ Private Type WinSocketDataType
     lpszVendorInfo As Long
 End Type
 
-Public Function GetMyIP() As IPAddressV4
+Public Function GetMyIP() As IpAddress
     Dim sIP As String
-    Dim l As List: Set l = GetIPs
-    sIP = l.First
+    Dim L As List: Set L = GetIPs
+    sIP = L.First
     Set GetMyIP = MNew.IPAddressV4(sIP)
 End Function
 
 Public Function GetIPs() As List
     Set GetIPs = MNew.List(vbString)
-    Dim ip As String, Host As String
-    Dim x As Integer
+    Dim IP As String, Host As String
+    Dim X As Integer
     
     InitSocketAPI
     Host = MyHostName
     
     Do
-        ip = HostByName(Host, x)
-        If Len(ip) <> 0 Then GetIPs.Add ip
-        x = x + 1
-    Loop While Len(ip) > 0
+        IP = HostByName(Host, X)
+        If Len(IP) <> 0 Then GetIPs.Add IP
+        X = X + 1
+    Loop While Len(IP) > 0
     
     CleanSockets
 End Function
@@ -93,7 +93,7 @@ Public Function MyHostName() As String
     End If
 End Function
 
-Private Function HostByName(Name As String, Optional x As Integer = 0) As String
+Private Function HostByName(Name As String, Optional X As Integer = 0) As String
     Dim MemIp() As Byte
     Dim y As Integer
     Dim HostDeAddress As Long, HostIp As Long
@@ -108,7 +108,7 @@ Private Function HostByName(Name As String, Optional x As Integer = 0) As String
     
     Call RtlMoveMemory(Host, HostDeAddress, LenB(Host))
     
-    For y = 0 To x
+    For y = 0 To X
         Call RtlMoveMemory(HostIp, Host.hAddrList + 4 * y, 4)
         If HostIp = 0 Then
             HostByName = ""

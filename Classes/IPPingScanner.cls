@@ -13,35 +13,35 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Event FoundIP(aIPV4 As IPAddressV4, ByRef out_Cancel As Boolean)
+Public Event FoundIP(aIP As IpAddress, ByRef out_Cancel As Boolean)
 
-Public Sub Scan(IPBase As IPAddressV4, ByVal IPFrom As Long, ByVal IPTo As Long)
+Public Sub Scan(IPBase As IpAddress, ByVal IPFrom As Long, ByVal IPTo As Long)
     Dim WSShell As Object: Set WSShell = CreateObject("WScript.Shell")
-    Dim newIPV4 As IPAddressV4: Set newIPV4 = IPBase.Clone
+    Dim newIP  As IpAddress: Set newIP = IPBase.Clone
     Dim ib As Long
     Dim Cancel As Boolean
     'IPTo = Min(IPTo, 255)
     For ib = IPFrom To IPTo
-        newIPV4.CallNslookup WSShell
-        RaiseEvent FoundIP(newIPV4, Cancel)
+        newIP.CallNslookup WSShell
+        RaiseEvent FoundIP(newIP, Cancel)
         If Cancel Then Exit For
-        Set newIPV4 = newIPV4.Clone
-        newIPV4.OneUp
+        Set newIP = newIP.Clone
+        newIP.OneUp
     Next
 End Sub
 
-Public Sub Scan2(IPBase As IPAddressV4, ByVal IPFrom As Long, ByVal IPTo As Long)
-    Dim newIPV4 As IPAddressV4: Set newIPV4 = IPBase.Clone
+Public Sub Scan2(IPBase As IpAddress, ByVal IPFrom As Long, ByVal IPTo As Long)
+    Dim newIP As IpAddress: Set newIP = IPBase.Clone
     Dim ib As Long
     Dim Cancel As Boolean
     'IPTo = Min(IPTo, 255)
     For ib = IPFrom To IPTo
         'newIPV4.CallNslookup WSShell
-        newIPV4.CallDNS
-        RaiseEvent FoundIP(newIPV4, Cancel)
+        newIP.CallDNS
+        RaiseEvent FoundIP(newIP, Cancel)
         If Cancel Then Exit For
-        Set newIPV4 = newIPV4.Clone
-        newIPV4.OneUp
+        Set newIPV4 = newIP.Clone
+        newIP.OneUp
     Next
 End Sub
 
