@@ -12,8 +12,8 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-Private m_IPBase      As IpAddress
-Private m_LastIP      As IpAddress
+Private m_IPBase      As IPAddress
+Private m_LastIP      As IPAddress
 Private m_SearchNIPs  As Long
 Private m_StartIPb4   As Long 'was is das gleich wieder?
 
@@ -30,7 +30,7 @@ Private Sub Class_Initialize()
     Set m_NetClients = MNew.List(vbObject)
 End Sub
 
-Friend Sub New_(aIPBase As IpAddress, aLastIP As IpAddress, nSearchIPs As Long, aScanner As IPPingScanner) ', StartIPb4 As Long)
+Friend Sub New_(aIPBase As IPAddress, aLastIP As IPAddress, nSearchIPs As Long, aScanner As IPPingScanner) ', StartIPb4 As Long)
     Set m_IPBase = aIPBase: Set m_LastIP = aLastIP: m_SearchNIPs = nSearchIPs: Set IPPingScanner = aScanner
 End Sub
 
@@ -45,22 +45,22 @@ Public Property Get FileName() As String
     FileName = m_FileName
 End Property
 
-Public Property Get IPAddresses() As IPAddresses
-    Set IPAddresses = m_IPAddresses
-End Property
+'Public Property Get IPAddresses() As IPAddresses
+'    Set IPAddresses = m_IPAddresses
+'End Property
 
-Public Property Get IPBase() As IpAddress
+Public Property Get IPBase() As IPAddress
     Set IPBase = m_IPBase
 End Property
-Public Property Set IPBase(Value As IpAddress)
+Public Property Set IPBase(Value As IPAddress)
     Set m_IPBase = Value
     m_Changed = True
 End Property
 
-Public Property Get LastIP() As IpAddress
+Public Property Get LastIP() As IPAddress
     Set LastIP = m_LastIP
 End Property
-Public Property Set LastIP(Value As IpAddress)
+Public Property Set LastIP(Value As IPAddress)
     Set m_LastIP = Value
     m_Changed = True
 End Property
@@ -98,7 +98,7 @@ Public Property Get IsDataChanged() As Boolean
     IsDataChanged = m_Changed
 End Property
 
-Private Sub IPPingScanner_FoundIP(aIPV4 As IpAddress, out_Cancel As Boolean)
+Private Sub IPPingScanner_FoundIP(aIPV4 As IPAddress, out_Cancel As Boolean)
     'If Not m_IPAddresses.Contains(aIPV4.IPToStr) Then
         '
     End If

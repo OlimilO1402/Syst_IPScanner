@@ -270,7 +270,7 @@ Private Sub Form_Load()
     mnuPopup.Visible = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = MouseButtonConstants.vbRightButton Then
         PopupMenu mnuopt
     End If
@@ -308,7 +308,7 @@ End Sub
 Public Sub UpdateView()
     Dim Doc As Document: Set Doc = MApp.Doc
     Me.TxtIPBase.Text = Doc.IPBase.ToStr
-    Dim IP As IpAddress
+    Dim IP As IPAddress
     Dim i As Long
     For i = 1 To Doc.IPAddresses.Count
         Set IP = Doc.IPAddresses.ItemI(i)
@@ -392,7 +392,7 @@ Private Sub mnuPopAddPort_Click()
     Dim i As Long: i = mnuPopListBox.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = mnuPopListBox.List(i)
-    Dim aIP As IpAddress
+    Dim aIP As IPAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIP = MApp.Doc.IPAddresses.Item(s)
         'aIPV4.CallPing
@@ -404,7 +404,7 @@ Private Sub mnuOptPingIP_Click()
     Dim i As Long: i = mnuPopListBox.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = mnuPopListBox.List(i)
-    Dim aIPV4 As IpAddress
+    Dim aIPV4 As IPAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         aIPV4.CallPing
@@ -415,7 +415,7 @@ Private Sub mnuOptPingIPport_Click()
     Dim i As Long: i = mnuPopListBox.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = mnuPopListBox.List(i)
-    Dim aIPV4 As IpAddress
+    Dim aIPV4 As IPAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         Set aIPV4 = aIPV4.Clone
@@ -438,7 +438,7 @@ End Sub
 Private Sub mnuOptionsUserPCName_Click()
 Try: On Error GoTo Catch
     'den Usernamen und den PC-Namen herausfinden und ins Netzwerk in eine Datei schreiben bzw anhängen
-    Dim IP As IpAddress: Set IP = MSocket.GetMyIP
+    Dim IP As IPAddress: Set IP = MSocket.GetMyIP
     Dim un As String:          un = MApp.UserName
     Dim cn As String:          cn = MApp.ComputerName
     Dim hn As String:          hn = MSocket.MyHostName
@@ -446,11 +446,11 @@ Try: On Error GoTo Catch
     '       "Userrname:    " & un & vbCrLf & _
     '       "Computername: " & cn & vbCrLf & _
     '       "Hostname:     " & hn
-    Dim pfn As PathFileName: Set pfn = MNew.PathFileName("C:\Install\IPScanner\IPScanner.bin")
-    If Not pfn.PathExists Then
-        If MsgBox("Path does not exist, Create Path?" & vbCrLf & pfn.Path, vbOKCancel) = vbCancel Then Exit Sub
-        If Not pfn.PathCreate Then
-            MsgBox "Could not create path: " & vbCrLf & pfn.Path
+    Dim PFN As PathFileName: Set PFN = MNew.PathFileName("C:\Install\IPScanner\IPScanner.bin")
+    If Not PFN.PathExists Then
+        If MsgBox("Path does not exist, Create Path?" & vbCrLf & PFN.Path, vbOKCancel) = vbCancel Then Exit Sub
+        If Not PFN.PathCreate Then
+            MsgBox "Could not create path: " & vbCrLf & PFN.Path
             Exit Sub
         End If
     End If
@@ -461,8 +461,8 @@ Try: On Error GoTo Catch
     
     fc = "IP-Address: " & vbTab & IP.ToStr & vbTab & "; Username: " & vbTab & un & vbTab & "; Computername: " & vbTab & cn
     
-    pfn.OpenFile FileMode_Append, FileAccess_Write
-    pfn.WriteStr fc
+    PFN.OpenFile FileMode_Append, FileAccess_Write
+    PFN.WriteStr fc
     
 'z.B. so:
 '* open Command prompt
@@ -473,7 +473,7 @@ Try: On Error GoTo Catch
 Catch:
     ErrHandler "mnuOptionsUserPCName"
 Finally:
-    If Not pfn Is Nothing Then pfn.CloseFile
+    If Not PFN Is Nothing Then PFN.CloseFile
 End Sub
 
 Private Sub mnuOptionNetViewDomain_Click()
@@ -492,7 +492,7 @@ End Sub
 ' v ############################## v '  Menu mnuInfo  ' v ############################## v '
 
 Private Sub mnuHelpExternalIP_Click()
-    Dim ipv4 As IpAddress: Set ipv4 = MNew.IpAddress(MApp.GetMyIP)
+    Dim ipv4 As IPAddress: Set ipv4 = MNew.IPAddressV(MApp.GetMyIP)
     Dim s As String: s = InputBox("My external IP:", , ipv4.ToStr)
 End Sub
 
@@ -503,10 +503,10 @@ End Sub
 ' ^ ############################## ^ '  Menu mnuInfo  ' ^ ############################## ^ '
 
 Private Sub TxtIPBase_LostFocus()
-    Dim NewBaseIP As IpAddress: Set NewBaseIP = MNew.IpAddress(TxtIPBase.Text)
-    TxtIPBase.Text = NewBaseIP.IPToStr
+    Dim NewBaseIP As IPAddress: Set NewBaseIP = MNew.IPAddressV(TxtIPBase.Text)
+    TxtIPBase.Text = NewBaseIP.ToStr
     Set MApp.Doc.IPBase = NewBaseIP
-    MApp.Doc.StartIPb4 = MApp.Doc.IPBase.b1
+    MApp.Doc.StartIPb4 = MApp.Doc.IPBase.ValueB1
     Set MApp.Doc.LastIP = MApp.Doc.IPBase.Clone
 End Sub
 
@@ -529,7 +529,7 @@ Private Sub BtnScanNextXXIPs_Click()
     LblDTime.Caption = "Ready! time: " & Format(dt, "#.00") & " sec"
 End Sub
 
-Private Sub IPPingScanner_FoundIP(aIPV4 As IpAddress, out_Cancel As Boolean)
+Private Sub IPPingScanner_FoundIP(aIPV4 As IPAddress, out_Cancel As Boolean)
     If Not MApp.Doc.IPAddresses.Contains(aIPV4.IPToStr) Then
         MApp.Doc.IPAddresses.Add aIPV4
     Else
@@ -549,7 +549,7 @@ End Sub
 Private Sub List1_Click()
     Dim i As Long: i = List1.ListIndex
     If i < 0 Then Exit Sub
-    Dim aIPV4 As IpAddress
+    Dim aIPV4 As IPAddress
     If MApp.Doc.IPAddresses.Contains(List1.List(i)) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(List1.List(i))
         TxtIPInfo.Text = aIPV4.ToInfoStr
@@ -558,7 +558,7 @@ End Sub
 Private Sub List1_DblClick()
     LB_DblClick List1
 End Sub
-Private Sub List1_MouseDown(Button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub List1_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     Dim btn As MouseButtonConstants: btn = Button
     If btn = vbRightButton Then
         Set mnuPopListBox = List1
@@ -570,7 +570,7 @@ Private Sub List2_Click()
     Dim i As Long: i = List2.ListIndex
     Dim s As String: s = List2.List(i)
     If i < 0 Then Exit Sub
-    Dim aIPV4 As IpAddress
+    Dim aIPV4 As IPAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         Debug.Print aIPV4.IPToStr
@@ -581,7 +581,7 @@ End Sub
 Private Sub List2_DblClick()
     LB_DblClick List2
 End Sub
-Private Sub List2_MouseDown(Button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub List2_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     Dim btn As MouseButtonConstants: btn = Button
     If btn = vbRightButton Then
         Set mnuPopListBox = List2
@@ -593,7 +593,7 @@ Private Sub LB_DblClick(aLB As ListBox)
     Dim i As Long: i = aLB.ListIndex
     If i < 0 Then Exit Sub
     Dim s As String: s = aLB.List(i)
-    Dim aIPV4 As IpAddress
+    Dim aIPV4 As IPAddress
     If MApp.Doc.IPAddresses.Contains(s) Then
         Set aIPV4 = MApp.Doc.IPAddresses.Item(s)
         If mnuOptDllOrNslookupDll.Checked Then

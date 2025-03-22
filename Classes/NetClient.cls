@@ -56,6 +56,7 @@ Public Sub CallPing(Optional WSShell As Object)
         m_Name = ParseNameFromPingResult(m_StatResult)
     End If
 End Sub
+
 Function ParseNameFromPingResult(s As String) As String
     Dim pos1 As Long: pos1 = InStr(1, s, "Ping wird ausgef")
     If pos1 <= 0 Then pos1 = 3
@@ -67,7 +68,7 @@ Function ParseNameFromPingResult(s As String) As String
 End Function
 
 'what about nslookup *IP*
-Public Sub CallNslookup(Optional WSShell As Object)
+Public Sub CallNslookup(IP As IPAddress, Optional WSShell As Object)
 Try: On Error GoTo Catch
     If WSShell Is Nothing Then Set WSShell = CreateObject("WScript.Shell")
     Dim WSSExec As Object: Set WSSExec = WSShell.Exec("nslookup " & Me.IPToStr)

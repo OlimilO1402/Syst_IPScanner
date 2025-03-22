@@ -1,5 +1,5 @@
 Type=Exe
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\WINDOWS\SysWow64\stdole2.tlb#OLE Automation
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Form=Forms\Form1.frm
 Module=MNew; Modules\MNew.bas
 Module=MApp; Modules\MApp.bas
@@ -20,8 +20,8 @@ Class=InternetURL; ..\Inet_URL\Classes\InternetURL.cls
 Class=OpenFileDialog; ..\Win_Dialogs\Classes\OpenFileDialog.cls
 Class=PathFileName; ..\IO_PathFileName\Classes\PathFileName.cls
 Class=List; ..\List_GenericNLinq\Classes\List.cls
-ResFile32="Resources\MyRes.res"
 Class=NetClient; Classes\NetClient.cls
+ResFile32="Resources\MyRes.res"
 IconForm="FrmIPPingScanner"
 Startup="Sub Main"
 HelpFile=""

@@ -53,7 +53,7 @@ Public Property Get Doc() As Document
 End Property
 
 Private Function CreateNewDoc() As Document
-    Dim ib As IpAddress: Set ib = MNew.IPAddressV4("192.168.178")
+    Dim ib As IPAddress: Set ib = MNew.IPAddressV("192.168.178")
     Set CreateNewDoc = MNew.Document(ib, ib.Clone, 50, FrmIPPingScanner.IPPingScanner)
 End Function
 Public Property Get FileName() As String
@@ -126,11 +126,11 @@ Try: On Error GoTo Finally
     Dim c As Long
     s = BinaryReadString(FNr): c = CLng(s)
     Dim i As Long
-    Dim IP As IpAddress
+    Dim IP As IPAddress
     'If c > 0 Then Set IPAddresses = New IPAddresses
     For i = 0 To c - 1
         s = BinaryReadString(FNr)
-        Set IP = New IpAddress
+        Set IP = New IPAddress
         IP.ReadFromStr s
         m_Doc.IPAddresses_Add IP
     Next
@@ -154,7 +154,7 @@ Try: On Error GoTo Finally
     BinaryWriteString FNr, CStr(m_Doc.StartIPb4)
     BinaryWriteString FNr, CStr(m_Doc.IPAddresses.Count)
     Dim i As Long
-    Dim IP As IpAddress
+    Dim IP As IPAddress
     Dim s As String
     For i = 1 To m_Doc.IPAddresses.Count '- 1
         Set IP = m_Doc.IPAddresses.ItemI(i)

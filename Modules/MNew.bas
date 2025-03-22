@@ -109,9 +109,9 @@ End Function
 'End Function
 '
 'Public Function MessCommonDlgError(e As MSComDlg.ErrorConstants) As String
-Public Function MessCommonDlgError(e As Long) As String
+Public Function MessCommonDlgError(E As Long) As String
     Dim s As String
-    Select Case e
+    Select Case E
     Case 0: s = "What error?"
 '    Case MSComDlg.ErrorConstants.cdlDialogFailure:        s = "Dialog Failure"         '= -32768 (&HFFFF8000)
 '    Case MSComDlg.ErrorConstants.cdlHelp:                 s = "Help"                   '= 32751 (&H7FEF)

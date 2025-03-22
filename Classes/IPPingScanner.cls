@@ -13,16 +13,19 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Event FoundIP(aIP As IpAddress, ByRef out_Cancel As Boolean)
+Public Event FoundIP(aIP As IPAddress, ByRef out_Cancel As Boolean)
 
-Public Sub Scan(IPBase As IpAddress, ByVal IPFrom As Long, ByVal IPTo As Long)
+Public Sub Scan(IPBase As IPAddress, ByVal IPFrom As Long, ByVal IPTo As Long)
     Dim WSShell As Object: Set WSShell = CreateObject("WScript.Shell")
-    Dim newIP  As IpAddress: Set newIP = IPBase.Clone
+    Dim newIP  As IPAddress: Set newIP = IPBase.Clone
     Dim ib As Long
     Dim Cancel As Boolean
+    Dim netCli As NetClient: Set netCli = New NetClient
+    
     'IPTo = Min(IPTo, 255)
     For ib = IPFrom To IPTo
-        newIP.CallNslookup WSShell
+        netCli.CallNslookup WSShell
+        'newIP.CallNslookup WSShell
         RaiseEvent FoundIP(newIP, Cancel)
         If Cancel Then Exit For
         Set newIP = newIP.Clone
@@ -30,8 +33,8 @@ Public Sub Scan(IPBase As IpAddress, ByVal IPFrom As Long, ByVal IPTo As Long)
     Next
 End Sub
 
-Public Sub Scan2(IPBase As IpAddress, ByVal IPFrom As Long, ByVal IPTo As Long)
-    Dim newIP As IpAddress: Set newIP = IPBase.Clone
+Public Sub Scan2(IPBase As IPAddress, ByVal IPFrom As Long, ByVal IPTo As Long)
+    Dim newIP As IPAddress: Set newIP = IPBase.Clone
     Dim ib As Long
     Dim Cancel As Boolean
     'IPTo = Min(IPTo, 255)
